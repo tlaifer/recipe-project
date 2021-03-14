@@ -1,3 +1,3 @@
 # recipe-project
 
-doc from remote2
+doc from remote3
