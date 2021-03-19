@@ -6,6 +6,7 @@ def return_pg():
         pg_conn = psycopg2.connect(dbname="recipe_dev", user="postgres", password="postgres")
     except:
         print("Unable to connect to the database.")
+        return
     
     cur = pg_conn.cursor()
     try:
