@@ -1,4 +1,4 @@
-# recipe-project
+# UIUC CS-411 recipe-project
 
 ## Setup requirements:
 ### Install postgres.
@@ -23,5 +23,9 @@ python3 -m pip freeze > requirements.txt
 
 Now, just run
 ```
-pip3 install -r requirements.text
+pip3 install -r requirements.txt
 ```
+
+## Helpful Links
+- restful API with flask-restful https://blog.miguelgrinberg.com/post/designing-a-restful-api-using-flask-restful
+- flask & react app - https://towardsdatascience.com/build-deploy-a-react-flask-app-47a89a5d17d9
