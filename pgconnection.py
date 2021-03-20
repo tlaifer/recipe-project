@@ -20,3 +20,16 @@ def return_pg():
         stringToReturn+= "   " + str(row)
     
     return stringToReturn
+
+def pg_setup():
+
+    cur = None
+
+    try:
+        pg_conn = psycopg2.connect(dbname="recipe_dev", user="postgres", password="postgres")
+    except:
+        print("Unable to connect to the database.")
+
+    cur = pg_conn.cursor()
+
+    return cur
