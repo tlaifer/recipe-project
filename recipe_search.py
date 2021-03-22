@@ -14,9 +14,8 @@ ingredient_input = [1,2,3] #TODO: get this from client
 def get_vetoed_ingredients():
 
     vetoed_ingredients = []
-
     query_string = """SELECT vetoIngredient FROM vetoedIngredients WHERE userId = {0}""".format(user_id)
-    
+
     try:
         pg_cur.execute(query_string)
     except:
@@ -34,7 +33,6 @@ def get_vetoed_ingredients():
 def get_techniques(vetoed):
 
     techniques = []
-
     query_string = """SELECT technique FROM userTechniques WHERE userId = {0} AND isVeto = {1}""".format(user_id, str(vetoed).upper())
     
     try:
