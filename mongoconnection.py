@@ -5,9 +5,7 @@ def return_one():
   mydb = myclient["recipe_dev"]
   mycol = mydb["Recipe"]
 
-  x = mycol.find_one()
-
-  return x
+  return mycol.find_one()
 
 def mongo_setup():
   myclient = pymongo.MongoClient("mongodb://localhost:27017/")
