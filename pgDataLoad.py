@@ -1,11 +1,14 @@
-import pyconnection
+import psycopg2
+import pgconnection
 import pandas as pd
 import numpy as np
-import DATA_DIRECTORY from mongoRecipeLoad
-import TECHNIQUES_LIST from mongoRecipeLoad
+import os
+from mongoRecipeLoad import DATA_DIRECTORY
+from mongoRecipeLoad import TECHNIQUES_LIST
 
 
-def create_tables():
+
+def create_tables(conn):
     """ source: https://www.postgresqltutorial.com/postgresql-python/create-tables/
     create tables in the PostgreSQL database
     """
@@ -27,7 +30,7 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS userTechniques (
                 id INT PRIMARY KEY,
                 userId INT,
-                technique INT
+                technique INT,
                 isVeto BOOL
                 )
         """,
@@ -45,20 +48,17 @@ def create_tables():
         """, 
         """
         CREATE TABLE IF NOT EXISTS ratings(
-            userId INT PRIMARY KEY, 
-            recipeId INT PRIMARY KEY,
-            favorite BOOL DEFAULT 'f'
-            rating numeric DEFAULT 0
+            userId INT, 
+            recipeId INT,
+            rating numeric DEFAULT 0,
+            favorite BOOL DEFAULT 'f',
+            CONSTRAINT pk_rating PRIMARY KEY (userId,recipeId)
             )
         """)
 
-        conn = None
     try:
-        # # read the connection parameters
-        params = config()
         # # connect to the PostgreSQL server
-        conn = psycopg2.connect(**params)
-        cur = pgconnection.pg_setup()
+        cur = conn.cursor()
         # create table one by one
         for command in commands:
             cur.execute(command)
@@ -72,6 +72,19 @@ def create_tables():
         if conn is not None:
             conn.close()
 
+def printAllTables(cursor):
+    cursor.execute("""SELECT table_name FROM information_schema.tables
+       WHERE table_schema = 'public'""")
+    for table in cursor.fetchall():
+        print(table)
+
+def dropTable(table):
+    conn = pgconnection.pg_conn()
+    conn.cursor().execute("DROP TABLE " + table)
+    conn.commit()
+
+    print("Dropped " + table + " table")
+
 
 def copy_from_file(conn, df, table):
     """
@@ -82,30 +95,30 @@ def copy_from_file(conn, df, table):
     and use copy_from() to copy it to the table
     """
     # Save the dataframe to disk
-    tmp_df = "./tmp_dataframe.csv"
-    df.to_csv(tmp_df, index_label='id', header=False)
-    f = open(tmp_df, 'r')
+    df_path = DATA_DIRECTORY + table + "_dataframe.csv"
+    df.to_csv(df_path, index = False, header=False)
+    f = open(df_path, 'r')
     cursor = conn.cursor()
     try:
         cursor.copy_from(f, table, sep=",")
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
-        os.remove(tmp_df)
         print("Error: %s" % error)
         conn.rollback()
         cursor.close()
         return 1
     print("copy_from_file() done")
     cursor.close()
-    os.remove(tmp_df)
 
 
-def loadRatingDf():
-    interation_df = pd.read_csv(DATA_DIRECTORY+"RAW_interactions.csv")
-    rating_df = interaction_df["user_id","recipe_id", "rating", "review"]
-    return rating_df.rename(columns = {"user_id" : "userId","recipe_id" : "recpieId"})
+def loadRatingsDf():
+    interaction_df = pd.read_csv(DATA_DIRECTORY+"RAW_interactions.csv")
+    interaction_df["favorite"] = interaction_df['user_id'].apply(lambda x: False)
+    rating_df = interaction_df[["user_id","recipe_id", "rating", "favorite"]]
+    rating_df = rating_df.rename(columns = {"user_id" : "userId", "recipe_id" : "recpieId"})
+    return rating_df
 
-def loadTechniqueDf():
+def loadTechniquesDf():
     t_df = pd.DataFrame(TECHNIQUES_LIST).rename(columns={0 : "techniqueName"})
     t_df["techniqueId"] = t_df.index
     return t_df[["techniqueId", "techniqueName"]]
@@ -113,6 +126,30 @@ def loadTechniqueDf():
 def loadIngredientsDf():
     i_df = pd.read_pickle(DATA_DIRECTORY+"ingr_map.pkl")
     i_df = i_df[["id", "replaced"]].rename(columns = {"id" : "ingredientsId", "replaced" : "ingredientName"})
+    i_df["ingredientName"] = i_df["ingredientName"].apply(removeComma)
     return i_df.drop_duplicates()
 
+def removeComma(s):
+    return s.replace(',', '')
 
+
+def doDataLoad():
+
+    print("Starting postgres dataload...")
+
+    dropTable("ratings")
+
+    create_tables(pgconnection.pg_conn())
+
+    print("Created all tables, printing all tables in pg...")
+
+    printAllTables(pgconnection.pg_conn().cursor())
+
+    copy_from_file(pgconnection.pg_conn(), loadRatingsDf(), "ratings")
+    copy_from_file(pgconnection.pg_conn(), loadTechniquesDf(), "techniques")
+    copy_from_file(pgconnection.pg_conn(), loadIngredientsDf(), "ingredients")
+
+    print("inserted data to tables")
+
+if __name__ == "__main__":
+    doDataLoad()

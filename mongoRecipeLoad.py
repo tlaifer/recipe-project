@@ -116,4 +116,5 @@ def cleanTechniques(rawTechniqueArr):
     indicesArr =  np.nonzero(ast.literal_eval(rawTechniqueArr))[0]
     return [TECHNIQUES_LIST[x] for x in indicesArr]
 
-loadRecipes()
+if __name__ == "__main__":
+    loadRecipes()

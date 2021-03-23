@@ -15,7 +15,9 @@ sample_pg = pgconnection.return_pg()
 class Hello(Resource):
     def get(self):
         hello = 'welcome to our application'
-        return { 'message': hello, 'mongoDbRecord' : str(sample_mongodb_doc) }
+        return { 'message': hello, 
+        'mongoDbRecord' : str(sample_mongodb_doc),
+        'pgRecord' : str(sample_pg) }
 
 class SearchAPI(Resource):
     def get(self):
