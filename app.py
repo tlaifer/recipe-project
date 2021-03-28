@@ -4,6 +4,7 @@ from flask_cors import CORS #comment this on deployment
 
 import pgconnection
 import mongoconnection
+import recipe_search
 
 app = Flask(__name__)
 CORS(app) #comment this on deployment
@@ -21,7 +22,9 @@ class Hello(Resource):
 
 class SearchAPI(Resource):
     def get(self):
-        return { f'message': f'implement search API' }
+        recipe_array = recipe_search.build_recipe_array()
+        recipe_results = { 'recipeArray': recipe_array }
+        return recipe_results
 
 class RecipeAPI(Resource):
     def get(self, id):

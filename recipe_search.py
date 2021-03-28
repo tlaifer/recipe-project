@@ -9,7 +9,14 @@ import pymongo
 
 pg_cur = pgconnection.pg_setup()
 user_id = 1 #TODO: get this from client
-ingredient_input = [1,2,3] #TODO: get this from client
+ingredient_input = [
+        "basmati rice",
+        "water",
+        "salt",
+        "cinnamon stick",
+        "green cardamom pods"
+      ]
+ #TODO: get this from client
 
 def get_vetoed_ingredients():
 
@@ -34,7 +41,7 @@ def get_techniques(vetoed):
 
     techniques = []
     query_string = """SELECT technique FROM userTechniques WHERE userId = {0} AND isVeto = {1}""".format(user_id, str(vetoed).upper())
-    
+
     try:
         pg_cur.execute(query_string)
     except:
@@ -80,17 +87,22 @@ def is_recipe_vetoed(recipe, vetoed_ingredients, vetoed_techniques):
 
     return False
 
-#TODO: write header
-def main():
+def build_recipe_array():
+
     recipe_db = mongoconnection.mongo_setup()
+    recipe_array = []
+    counter = 0 #TODO remove this
 
     vetoed_ingredients = get_vetoed_ingredients()
     vetoed_techniques = get_techniques(True)
     familiar_techniques = get_techniques(False)
-    
+
     user_has_veto = (len(vetoed_ingredients) >= 0) or (len(vetoed_techniques) >= 0)
 
-    for recipe in recipe_db.find():
+    for recipe in recipe_db.find({'ingredients': {'$in': ingredient_input}}):
+
+        if (counter >= 10): #TODO remove this
+            break
 
         # Initialize variables
         recipe_ingredients = recipe['ingredients']
@@ -118,10 +130,19 @@ def main():
                 if (technique in familiar_techniques):
                     technique_count += 1
     
-    #TODO: build recipe dictionaries here (or make a function to build them)
+        #TODO: build recipe dictionaries here (or make a function to build them)
 
+        recipe['_id'] = str(recipe['_id']) # format string so that JSON is properly formatted
+
+        recipe_array.append(recipe)
+        counter += 1 #TODO remove this
+
+    return recipe_array
+
+#TODO: remove everything after this (it's just here for testing)
+def main():
+    recipe_array = build_recipe_array()
     return
-
 
 if __name__ == '__main__':
     main()
