@@ -25,7 +25,6 @@ class SearchAPI(Resource):
         recipe_array = recipe_search.build_recipe_array()
         recipe_results = { 'recipeArray': recipe_array }
         return recipe_results
-        #return { f'message': f'implement search API' }
 
 class RecipeAPI(Resource):
     def get(self, id):

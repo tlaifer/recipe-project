@@ -14,11 +14,12 @@ ingredient_input = [1,2,3] #TODO: get this from client
 def get_vetoed_ingredients():
 
     vetoed_ingredients = []
-    query_string = """SELECT vetoIngredient FROM vetoedIngredients WHERE userId = {0}""".format(user_id)
-    #TODO: make into prepared statement
+    query_string = """PREPARE findVetoIngredients AS SELECT vetoIngredient FROM vetoedIngredients WHERE userId = %s"""
+    exec_string = """EXECUTE findVetoIngredients ('{0}')""".format(user_id)
 
     try:
         pg_cur.execute(query_string)
+        pg_cur.execute(exec_string)
     except:
         print("Can't retrieve vetoed ingredients.")
         return vetoed_ingredients
@@ -34,10 +35,12 @@ def get_vetoed_ingredients():
 def get_techniques(vetoed):
 
     techniques = []
-    query_string = """SELECT technique FROM userTechniques WHERE userId = {0} AND isVeto = {1}""".format(user_id, str(vetoed).upper())
-    
+    query_string = """PREPARE findTechniques AS SELECT technique FROM userTechniques WHERE userId = %s AND isVeto = %s""".format(user_id, str(vetoed).upper())
+    exec_string = """EXECUTE findTechniques ('{0}, {1}')""".format(user_id, str(vetoed).upper())
+
     try:
         pg_cur.execute(query_string)
+        pg_cur.execute(exec_string)
     except:
         print("Can't retrieve techniques.")
         return techniques
@@ -85,6 +88,7 @@ def build_recipe_array():
 
     recipe_db = mongoconnection.mongo_setup()
     recipe_array = []
+    counter = 0 #TODO remove this
 
     vetoed_ingredients = get_vetoed_ingredients()
     vetoed_techniques = get_techniques(True)
@@ -93,6 +97,9 @@ def build_recipe_array():
     user_has_veto = (len(vetoed_ingredients) >= 0) or (len(vetoed_techniques) >= 0)
 
     for recipe in recipe_db.find():
+
+        if (counter >= 10): #TODO remove this
+            break
 
         # Initialize variables
         recipe_ingredients = recipe['ingredients']
@@ -121,11 +128,13 @@ def build_recipe_array():
                     technique_count += 1
     
         #TODO: build recipe dictionaries here (or make a function to build them)
-        recipe_array.append(recipe) #TODO: uncomment this
 
-    #recipe_array.append({'see': 'theEpicToast'}) #TODO remove
-    #print(recipe_array)
+        recipe['_id'] = str(recipe['_id']) # format string so that JSON is properly formatted
 
+        recipe_array.append(recipe)
+        counter += 1 #TODO remove this
+
+    print(recipe_array) #TODO remove
     return recipe_array
 
 #TODO: remove everything after this (it's just here for testing)
