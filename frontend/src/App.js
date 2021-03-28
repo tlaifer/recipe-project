@@ -1,9 +1,8 @@
-import logo from './logo.svg';
 import './App.css';
-import SideMenu from "./SideMenu";
-import Search from "./Search";
+import NavLayout from "./NavLayout";
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'
+import axios from 'axios';
+
 
 function App(props, state) {
   const [getMessage, setGetMessage] = useState({})
@@ -19,8 +18,7 @@ function App(props, state) {
   }, [])
   return (
     <div className="App">
-      <SideMenu />
-      <Search />
+      <NavLayout/>
     </div>
   );
 }
