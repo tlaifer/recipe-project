@@ -15,6 +15,7 @@ def get_vetoed_ingredients():
 
     vetoed_ingredients = []
     query_string = """SELECT vetoIngredient FROM vetoedIngredients WHERE userId = {0}""".format(user_id)
+    #TODO: make into prepared statement
 
     try:
         pg_cur.execute(query_string)
@@ -80,14 +81,15 @@ def is_recipe_vetoed(recipe, vetoed_ingredients, vetoed_techniques):
 
     return False
 
-#TODO: write header
-def main():
+def build_recipe_array():
+
     recipe_db = mongoconnection.mongo_setup()
+    recipe_array = []
 
     vetoed_ingredients = get_vetoed_ingredients()
     vetoed_techniques = get_techniques(True)
     familiar_techniques = get_techniques(False)
-    
+
     user_has_veto = (len(vetoed_ingredients) >= 0) or (len(vetoed_techniques) >= 0)
 
     for recipe in recipe_db.find():
@@ -118,10 +120,18 @@ def main():
                 if (technique in familiar_techniques):
                     technique_count += 1
     
-    #TODO: build recipe dictionaries here (or make a function to build them)
+        #TODO: build recipe dictionaries here (or make a function to build them)
+        recipe_array.append(recipe) #TODO: uncomment this
 
+    #recipe_array.append({'see': 'theEpicToast'}) #TODO remove
+    #print(recipe_array)
+
+    return recipe_array
+
+#TODO: remove everything after this (it's just here for testing)
+def main():
+    recipe_array = build_recipe_array()
     return
-
 
 if __name__ == '__main__':
     main()
