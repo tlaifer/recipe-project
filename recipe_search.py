@@ -9,17 +9,22 @@ import pymongo
 
 pg_cur = pgconnection.pg_setup()
 user_id = 1 #TODO: get this from client
-ingredient_input = [1,2,3] #TODO: get this from client
+ingredient_input = [
+        "basmati rice",
+        "water",
+        "salt",
+        "cinnamon stick",
+        "green cardamom pods"
+      ]
+ #TODO: get this from client
 
 def get_vetoed_ingredients():
 
     vetoed_ingredients = []
-    query_string = """PREPARE findVetoIngredients AS SELECT vetoIngredient FROM vetoedIngredients WHERE userId = %s"""
-    exec_string = """EXECUTE findVetoIngredients ('{0}')""".format(user_id)
+    query_string = """SELECT vetoIngredient FROM vetoedIngredients WHERE userId = {0}""".format(user_id)
 
     try:
         pg_cur.execute(query_string)
-        pg_cur.execute(exec_string)
     except:
         print("Can't retrieve vetoed ingredients.")
         return vetoed_ingredients
@@ -35,12 +40,10 @@ def get_vetoed_ingredients():
 def get_techniques(vetoed):
 
     techniques = []
-    query_string = """PREPARE findTechniques AS SELECT technique FROM userTechniques WHERE userId = %s AND isVeto = %s""".format(user_id, str(vetoed).upper())
-    exec_string = """EXECUTE findTechniques ('{0}, {1}')""".format(user_id, str(vetoed).upper())
+    query_string = """SELECT technique FROM userTechniques WHERE userId = {0} AND isVeto = {1}""".format(user_id, str(vetoed).upper())
 
     try:
         pg_cur.execute(query_string)
-        pg_cur.execute(exec_string)
     except:
         print("Can't retrieve techniques.")
         return techniques
@@ -96,7 +99,7 @@ def build_recipe_array():
 
     user_has_veto = (len(vetoed_ingredients) >= 0) or (len(vetoed_techniques) >= 0)
 
-    for recipe in recipe_db.find():
+    for recipe in recipe_db.find({'ingredients': {'$in': ingredient_input}}):
 
         if (counter >= 10): #TODO remove this
             break
@@ -134,7 +137,6 @@ def build_recipe_array():
         recipe_array.append(recipe)
         counter += 1 #TODO remove this
 
-    print(recipe_array) #TODO remove
     return recipe_array
 
 #TODO: remove everything after this (it's just here for testing)
