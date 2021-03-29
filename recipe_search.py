@@ -18,6 +18,9 @@ ingredient_input = [
       ]
  #TODO: get this from client
 
+""" Description: Retrieves a list of the user's vetoed ingredients, saved in their user perferences.
+    Returns: An array of ingrediients the user has vetoed.
+"""
 def get_vetoed_ingredients():
 
     vetoed_ingredients = []
@@ -37,6 +40,12 @@ def get_vetoed_ingredients():
 
     return vetoed_ingredients
 
+""" Description: Retrieves a list of techniques related to the person using the recipe finder app.
+    Parameters: A boolean saying whether or not the function should retrieve vetoed techniques. If the parameter
+        is true, the function retrieves vetoed techniques. If it is false, the function retrieves preferred
+        techniques.
+    Returns: An array of techniques that meet the criteria of the parameter (vetoed vs preferred).
+"""
 def get_techniques(vetoed):
 
     techniques = []
@@ -56,7 +65,9 @@ def get_techniques(vetoed):
 
     return techniques
 
-#TODO: write header
+""" Description: Evaluates whether a recipe contains a vetoed ingredient or technique.
+    Returns: A boolean indicating whether or not the recipe contains a vetoed ingredient or technique.
+"""
 def is_entity_vetoed(user, entity_array, vetoed_array):
 
     if (len(entity_array) <= 0): # nothing is vetoed
@@ -72,7 +83,10 @@ def is_entity_vetoed(user, entity_array, vetoed_array):
 
     return vetoed
 
-#TODO: write header
+""" Description: Evaluates whether a recipe should be discarded from the user's recipe search. A recipe
+        will be discarded from the search results if it contains at least one vetoed ingredient or technique.
+    Returns: A boolean indicating whether or not the recipe should be returned in the search results.
+"""
 def is_recipe_vetoed(recipe, vetoed_ingredients, vetoed_techniques):
 
     recipe_ingredients = recipe['ingredients']
@@ -87,11 +101,18 @@ def is_recipe_vetoed(recipe, vetoed_ingredients, vetoed_techniques):
 
     return False
 
+""" Description: Function to sort through all recipes and build an array of recipes that meet the user's
+        search criteria. The function evaluates all recipes that contain at least one ingredient that the
+        user specified, discards recipes that contain a vetoed ingredient or technique, and adds the
+        remaining recipes to an array.
+    Returns: An array of all recipes that meet the user's search criteria. The recipe objects in the
+        resulting array also include a count of specified ingredients, extra ingredients, and preferred
+        techniques per recipe.
+"""
 def build_recipe_array():
 
     recipe_db = mongoconnection.mongo_setup()
     recipe_array = []
-    counter = 0 #TODO remove this
 
     vetoed_ingredients = get_vetoed_ingredients()
     vetoed_techniques = get_techniques(True)
@@ -100,9 +121,6 @@ def build_recipe_array():
     user_has_veto = (len(vetoed_ingredients) >= 0) or (len(vetoed_techniques) >= 0)
 
     for recipe in recipe_db.find({'ingredients': {'$in': ingredient_input}}):
-
-        if (counter >= 10): #TODO remove this
-            break
 
         # Initialize variables
         recipe_ingredients = recipe['ingredients']
@@ -129,17 +147,17 @@ def build_recipe_array():
             for technique in recipe_techniques:
                 if (technique in familiar_techniques):
                     technique_count += 1
-    
-        #TODO: build recipe dictionaries here (or make a function to build them)
 
         recipe['_id'] = str(recipe['_id']) # format string so that JSON is properly formatted
+        recipe['ingredient_count'] = ingredient_count
+        recipe['extra_count'] = extra_count
+        recipe['technique_count'] = technique_count
 
         recipe_array.append(recipe)
-        counter += 1 #TODO remove this
 
     return recipe_array
 
-#TODO: remove everything after this (it's just here for testing)
+#TODO: remove this section, it is just here for testing/debugging
 def main():
     recipe_array = build_recipe_array()
     return
