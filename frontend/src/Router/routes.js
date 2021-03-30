@@ -10,7 +10,7 @@ const routes = [
     exact: true,
     name: "Search",
     toolbar: () => <p>Search</p>,
-    main: () => <Search />,
+    main: (props) => <Search />,
     inMenu: true
   },
   {
@@ -31,7 +31,7 @@ const routes = [
     path: "/recipies/:recipeId",
     name: "Recipe",
     toolbar: () => <p>Recipe</p>,
-    main: () => <Recipe />,
+    main: (props) => <Recipe {...props}/>,
     inMenu: false
   }
 ];

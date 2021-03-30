@@ -43,8 +43,21 @@
   padding: 20px;
 }
 
-.Page {
-  width: 70%;
-  float: right
+.body {
+  width: 85%;
+  float: right;
+  padding: 20px;
 }
 
+.formControl {
+  margin: 3px,
+}
+
+.paper {
+  padding: 2;
+  text-align: 'center';
+}
+
+.table {
+  min-width: 650
+}

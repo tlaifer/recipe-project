@@ -3,15 +3,20 @@ import {
   useParams
 } from "react-router-dom";
 
-function DisplayRecipe() {
-  let { recipeId } = useParams();
-  return <h1> Displaying recipe {recipeId}</h1>;
-}
 
 class Recipe extends React.Component {
+  state = {
+    recipeId: ''
+  }
+
+  componentDidMount () {
+    const recipeId = this.props.match.params.recipeId
+    this.setState({ recipeId: recipeId })
+  }
+
   render() {
     return (
-      <DisplayRecipe/>
+      <h1> Displaying recipe {this.state.recipeId}</h1>
     )
   }
 }
