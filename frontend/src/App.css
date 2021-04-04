@@ -49,8 +49,8 @@
   padding: 20px;
 }
 
-.formControl {
-  margin: 3px,
+.user-inputs {
+  display: flex;
 }
 
 .paper {
@@ -60,4 +60,8 @@
 
 .table {
   min-width: 650
+}
+
+.right {
+  float:right
 }

@@ -10,7 +10,7 @@ const routes = [
     exact: true,
     name: "Search",
     toolbar: () => <p>Search</p>,
-    main: (props) => <Search />,
+    main: (props) => <Search {...{display: 'search'}}/>,
     inMenu: true
   },
   {

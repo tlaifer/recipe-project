@@ -6,8 +6,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Link from '@material-ui/core/Link';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 
-import config from "../config.json";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
@@ -47,37 +48,26 @@ let ingredients = [
 let recipes = [
   {
     id: '1',
+    name: 'recipe name',
     ingredients: ['a', 'list', 'of', 'things'],
     techniques: ['a', 'list', 'of', 'things'],
     rating: 4.7,
     cookTime: 35
   }
 ];
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-let rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-]
-
 class Search extends Component {
-  state = {
-    selectedIngredients: '',
-    display: 'search',
-  };
+  constructor(props) {
+    super(props);
 
-  componentDidMount () {
-    this.setState({ display: 'search' })
-  }
+    this.state = {
+      selectedIngredients: '',
+      display: this.props.display,
+    }
+  };
 
   handleSearch = () => {
     var results = this.makeApiCall(this.state.searchValue);
-    this.setState({ searchResults:  rows});
+    this.setState({ searchResults:  results});
     this.setState({ display: 'results'});
   }
 
@@ -85,18 +75,27 @@ class Search extends Component {
     this.setState({ selectedIngredients: value });
   };
 
+  handleBack = () => {
+    this.setState({ display: 'search' })
+  }
+
   makeApiCall = (searchInput) => {
-    // var searchUrl = `${config.SERVER_URL}/api/user/${searchInput}`
-    // fetch(searchUrl).then(response => {
-    //   return response.json()
-    // }).then(jsonData => {
-    //   console.log(jsonData)
-    // })
+    /**
+     * TODO: call search API
+     *
+     */
     return recipes;
   }
 
+  saveFavorite = (recipeId) => {
+    return;
+    /**
+     * TODO: call favorite API
+     */
+  }
+
   render() {
-    if (this.state.display == 'search') {
+    if (this.state.display === 'search') {
       return (
         <div className = 'body'>
           <h1> Ready to search for your next meal? </h1>
@@ -106,7 +105,6 @@ class Search extends Component {
               id="tags-standard"
               style={{ alignContent: "left" }}
               options={ingredients.map(ingredient => ingredient.name)}
-              // defaultValue={[state.ingredients[0].name]}
               getOptionLabel={(option) => option}
               onChange={(event,value, reason) => this.handleIngredientChange(event, value, reason)}
               renderInput={(params) => (
@@ -126,6 +124,7 @@ class Search extends Component {
     } else {
       return (
         <div className = 'body'>
+          <Button variant="contained" color="primary" onClick={this.handleBack}>New Search</Button>
           <TableContainer component={Paper}>
             <Table className="table" aria-label="simple table">
               <TableHead>
@@ -135,18 +134,24 @@ class Search extends Component {
                   <TableCell align="right">Techniques</TableCell>
                   <TableCell align="right">Cooking Time</TableCell>
                   <TableCell align="right">Average Rating</TableCell>
+                  <TableCell align="right">Add to Favorites</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.name}>
+                {recipes.map((row) => (
+                  <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      {row.name}
+                      <Link href={"/recipies/" + row.id} >{row.name}</Link>
                     </TableCell>
-                    <TableCell align="right">{row.calories}</TableCell>
-                    <TableCell align="right">{row.fat}</TableCell>
-                    <TableCell align="right">{row.carbs}</TableCell>
-                    <TableCell align="right">{row.protein}</TableCell>
+                    <TableCell align="right">{row.ingredients.join(', ')}</TableCell>
+                    <TableCell align="right">{row.techniques.join(', ')}</TableCell>
+                    <TableCell align="right">{row.cookTime}</TableCell>
+                    <TableCell align="right">{row.rating}</TableCell>
+                    <TableCell align="center">
+                      <Button onClick={this.saveFavorite(row.id)}>
+                        <FavoriteIcon/>
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

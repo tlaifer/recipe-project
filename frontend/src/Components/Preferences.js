@@ -1,6 +1,5 @@
 import React, {Component} from "react";
 import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
@@ -10,6 +9,8 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 
 
 const submitButtonText = 'Save Changes'
@@ -41,11 +42,45 @@ let ingredients = [
   }
 ]
 
+let users = [
+  {
+    name: 'tali'
+  },
+  {
+    name: 'dominic'
+  }
+]
 class Preferences extends Component {
   state = {
+    selectedUser: '',
     techniques: techniques,
-    ingredients: ingredients
+    ingredients: ingredients,
+    allUsers: users,
+    newUserInputName: ''
   };
+
+  handleNameChange = (event) => {
+    this.setState({
+      newUserInputName: event.target.value
+    });
+  }
+
+  createUser = () => {
+    /**
+     * TODO: create user
+     */
+    return;
+  }
+
+  handleUserChage = (event) => {
+    this.setState({
+      user: event.target.value
+    });
+    /**
+     * TODO: fetch user prefs
+     */
+    this.render();
+  }
 
   handleTechniqueChange = (event) => {
     let index = techniques.findIndex(element => {
@@ -72,7 +107,7 @@ class Preferences extends Component {
     this.setState({ ingredients: ingredients });
   };
 
-  handleSubmit = () => {
+  handleSubmitPreferences = () => {
     /**
      * TODO: submit user preferences to server
      */
@@ -82,17 +117,27 @@ class Preferences extends Component {
   render() {
     return (
       <div className="body">
+        <div className="user-inputs">
+          <Grid container spacing={3}>
+            <Grid item xs>Choose your user
+              <Select
+                labelId="select-user"
+                value={this.user}
+                onChange={this.handleUserChage}
+              >
+                {users.map(u => {
+                  return (<MenuItem value={u.name}>{u.name}</MenuItem>)
+                })}
+              </Select>
+            </Grid>
+            <Grid item xs>
+              <TextField id="user-input" label="user name" variant="outlined" type="search" value={this.newUserInputName} onChange={this.handleNameChange}/>
+              <Button variant="contained" color="default" onClick={this.handleCreateUser}>create user!</Button>
+            </Grid>
+          </Grid>
+        </div>
         <Grid container spacing={3}>
-          <Grid item xs>
-          </Grid>
-          <Grid item xs>
-          </Grid>
-          <Grid item xs>
-            <Button variant="contained" color="primary" onClick={this.handleSubmit}>{submitButtonText}</Button>
-          </Grid>
-        </Grid>
-        <Grid container spacing={3}>
-          <FormControl component="fieldset" className="formControl">
+          <FormControl component="fieldset">
             <FormLabel component="legend">What can you do in the kitchen?</FormLabel>
             <FormGroup>
               {this.state.techniques.map(t=>{
@@ -127,6 +172,15 @@ class Preferences extends Component {
               />
             )}
           />
+        </Grid>
+        <Grid container spacing={3}>
+          <Grid item xs>
+          </Grid>
+          <Grid item xs>
+          </Grid>
+          <Grid item xs>
+            <Button variant="contained" color="primary" onClick={this.handleSubmitPreferences}>{submitButtonText}</Button>
+          </Grid>
         </Grid>
       </div>
     );
