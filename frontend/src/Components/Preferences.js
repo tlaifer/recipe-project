@@ -65,7 +65,7 @@ class Preferences extends Component {
     });
   }
 
-  createUser = () => {
+  handleCreateUser = () => {
     /**
      * TODO: create user
      */
