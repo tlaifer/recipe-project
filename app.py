@@ -23,9 +23,9 @@ class Hello(Resource):
 
 class SearchAPI(Resource):
     def get(self):
-        recipe_array = backend.search.recipeSearch.build_recipe_array()
-        recipe_results = { 'recipeArray': recipe_array }
-        return recipe_results
+        recipeArray = backend.search.recipeSearch.buildRecipeArray()
+        recipeResults = { 'recipeArray': recipeArray }
+        return recipeResults
 
 class RecipeAPI(Resource):
     def get(self, id):

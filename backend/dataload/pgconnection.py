@@ -23,13 +23,13 @@ def return_pg():
 
 def pg_setup():
 
-    pg_conn = pg_connection()
+    pg_connection = pg_conn()
 
-    cur = pg_conn.cursor()
+    cur = pg_connection.cursor()
 
     return cur
 
-def pg_connection():
+def pg_conn():
     try:
         pg_conn = psycopg2.connect(dbname="recipe_dev", user="postgres", password="postgres")
     except:
