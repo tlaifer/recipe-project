@@ -1,5 +1,5 @@
 from flask_restful import fields, marshal_with, reqparse, Resource
-from dataload.pgconnection import pg_conn
+from backend.dataload.pgconnection import pg_connection
 
 
 def sqlHelper(sqlStatement, inputTuple, func):
