@@ -1,5 +1,5 @@
-import mongoconnection
-import pgconnection
+import backend.dataload.mongoconnection as mongoconnection
+import backend.dataload.pgconnection as pgconnection
 import psycopg2
 import pymongo
 
@@ -7,9 +7,9 @@ import pymongo
 #1. Will ingredient input always be > 0?
 #2. Will client prevent user from picking an input ingredient that is also a vetoed ingredient?
 
-pg_cur = pgconnection.pg_setup()
-user_id = 1 #TODO: get this from client
-ingredient_input = [
+pgCur = pgconnection.pg_setup()
+userId = 1 #TODO: get this from client
+ingredientInput = [
         "basmati rice",
         "water",
         "salt",
@@ -21,24 +21,24 @@ ingredient_input = [
 """ Description: Retrieves a list of the user's vetoed ingredients, saved in their user perferences.
     Returns: An array of ingrediients the user has vetoed.
 """
-def get_vetoed_ingredients():
+def getVetoedIngredients():
 
-    vetoed_ingredients = []
-    query_string = """SELECT vetoIngredient FROM vetoedIngredients WHERE userId = {0}""".format(user_id)
+    vetoedIngredients = []
+    queryString = """SELECT vetoIngredient FROM vetoedIngredients WHERE userId = {0}""".format(userId)
 
     try:
-        pg_cur.execute(query_string)
+        pgCur.execute(queryString)
     except:
         print("Can't retrieve vetoed ingredients.")
-        return vetoed_ingredients
+        return vetoedIngredients
 
-    rows = pg_cur.fetchall()
+    rows = pgCur.fetchall()
 
     if (len(rows) > 0):
         for row in rows:
-            vetoed_ingredients.append(row[0])
+            vetoedIngredients.append(row[0])
 
-    return vetoed_ingredients
+    return vetoedIngredients
 
 """ Description: Retrieves a list of techniques related to the person using the recipe finder app.
     Parameters: A boolean saying whether or not the function should retrieve vetoed techniques. If the parameter
@@ -46,18 +46,18 @@ def get_vetoed_ingredients():
         techniques.
     Returns: An array of techniques that meet the criteria of the parameter (vetoed vs preferred).
 """
-def get_techniques(vetoed):
+def getTechniques(vetoed):
 
     techniques = []
-    query_string = """SELECT technique FROM userTechniques WHERE userId = {0} AND isVeto = {1}""".format(user_id, str(vetoed).upper())
+    queryString = """SELECT technique FROM userTechniques WHERE userId = {0} AND isVeto = {1}""".format(userId, str(vetoed).upper())
 
     try:
-        pg_cur.execute(query_string)
+        pgCur.execute(queryString)
     except:
         print("Can't retrieve techniques.")
         return techniques
 
-    rows = pg_cur.fetchall()
+    rows = pgCur.fetchall()
 
     if (len(rows) > 0):
         for row in rows:
@@ -68,16 +68,16 @@ def get_techniques(vetoed):
 """ Description: Evaluates whether a recipe contains a vetoed ingredient or technique.
     Returns: A boolean indicating whether or not the recipe contains a vetoed ingredient or technique.
 """
-def is_entity_vetoed(user, entity_array, vetoed_array):
+def isEntityVetoed(user, entityArray, vetoedArray):
 
-    if (len(entity_array) <= 0): # nothing is vetoed
+    if (len(entityArray) <= 0): # nothing is vetoed
         return False
 
     vetoed = False
-    vetoed_array = None
+    vetoedArray = None
 
-    for entity in entity_array:
-        if (entity in vetoed_array):
+    for entity in entityArray:
+        if (entity in vetoedArray):
             vetoed = True
             break
 
@@ -87,16 +87,16 @@ def is_entity_vetoed(user, entity_array, vetoed_array):
         will be discarded from the search results if it contains at least one vetoed ingredient or technique.
     Returns: A boolean indicating whether or not the recipe should be returned in the search results.
 """
-def is_recipe_vetoed(recipe, vetoed_ingredients, vetoed_techniques):
+def isRecipeVetoed(recipe, vetoedIngredients, vetoedTechniques):
 
-    recipe_ingredients = recipe['ingredients']
-    recipe_techniques = recipe['techniques']
+    recipeIngredients = recipe['ingredients']
+    recipeTechniques = recipe['techniques']
 
-    if (len(vetoed_ingredients) > 0): # if user has vetoed an ingredient
-        if (is_entity_vetoed(user_id, recipe_ingredients, vetoed_ingredients) == True):
+    if (len(vetoedIngredients) > 0): # if user has vetoed an ingredient
+        if (isEntityVetoed(userId, recipeIngredients, vetoedIngredients) == True):
             return True
-    elif (len(vetoed_techniques) > 0): # if user has vetoed a technique
-        if (is_entity_vetoed(user_id, recipe_techniques, vetoed_techniques) == True):
+    elif (len(vetoedTechniques) > 0): # if user has vetoed a technique
+        if (isEntityVetoed(userId, recipeTechniques, vetoedTechniques) == True):
             return True
 
     return False
@@ -109,57 +109,57 @@ def is_recipe_vetoed(recipe, vetoed_ingredients, vetoed_techniques):
         resulting array also include a count of specified ingredients, extra ingredients, and preferred
         techniques per recipe.
 """
-def build_recipe_array():
+def buildRecipeArray():
 
-    recipe_db = mongoconnection.mongo_setup()
-    recipe_array = []
+    recipeDb = mongoconnection.mongo_setup()
+    recipeArray = []
 
-    vetoed_ingredients = get_vetoed_ingredients()
-    vetoed_techniques = get_techniques(True)
-    familiar_techniques = get_techniques(False)
+    vetoedIngredients = getVetoedIngredients()
+    vetoedTechniques = getTechniques(True)
+    familiarTechniques = getTechniques(False)
 
-    user_has_veto = (len(vetoed_ingredients) >= 0) or (len(vetoed_techniques) >= 0)
+    userHasVeto = (len(vetoedIngredients) >= 0) or (len(vetoedTechniques) >= 0)
 
-    for recipe in recipe_db.find({'ingredients': {'$in': ingredient_input}}):
+    for recipe in recipeDb.find({'ingredients': {'$in': ingredientInput}}):
 
         # Initialize variables
-        recipe_ingredients = recipe['ingredients']
-        recipe_techniques = recipe['techniques']
-        ingredient_count = 0
-        extra_count = 0
-        technique_count = 0
+        recipeIngredients = recipe['ingredients']
+        recipeTechniques = recipe['techniques']
+        ingredientCount = 0
+        extraCount = 0
+        techniqueCount = 0
 
         # If there is at least one veto preference, check if we should veto this recipe
-        if (user_has_veto == True):
-            if (is_recipe_vetoed(recipe, vetoed_ingredients, vetoed_techniques) == True):
+        if (userHasVeto == True):
+            if (isRecipeVetoed(recipe, vetoedIngredients, vetoedTechniques) == True):
                 break # recipe is vetoed
 
-        if (len(recipe_ingredients) <= 0):
+        if (len(recipeIngredients) <= 0):
             break # recipe has no ingredients. should not happen, but checking just in case
 
-        for ingredient in recipe_ingredients:
-            if (ingredient in ingredient_input):
-                ingredient_count += 1
+        for ingredient in recipeIngredients:
+            if (ingredient in ingredientInput):
+                ingredientCount += 1
             else:
-                extra_count += 1
+                extraCount += 1
 
-        if (len(recipe_techniques) > 0):
-            for technique in recipe_techniques:
-                if (technique in familiar_techniques):
-                    technique_count += 1
+        if (len(recipeTechniques) > 0):
+            for technique in recipeTechniques:
+                if (technique in familiarTechniques):
+                    techniqueCount += 1
 
         recipe['_id'] = str(recipe['_id']) # format string so that JSON is properly formatted
-        recipe['ingredient_count'] = ingredient_count
-        recipe['extra_count'] = extra_count
-        recipe['technique_count'] = technique_count
+        recipe['ingredientCount'] = ingredientCount
+        recipe['extraCount'] = extraCount
+        recipe['techniqueCount'] = techniqueCount
 
-        recipe_array.append(recipe)
+        recipeArray.append(recipe)
 
-    return recipe_array
+    return recipeArray
 
 #TODO: remove this section, it is just here for testing/debugging
 def main():
-    recipe_array = build_recipe_array()
+    recipeArray = buildRecipeArray()
     return
 
 if __name__ == '__main__':

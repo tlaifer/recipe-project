@@ -23,9 +23,9 @@ def return_pg():
 
 def pg_setup():
 
-    pg_conn = pg_conn()
+    pg_connection = pg_conn()
 
-    cur = pg_conn.cursor()
+    cur = pg_connection.cursor()
 
     return cur
 

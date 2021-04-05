@@ -2,10 +2,10 @@ from flask import Flask, send_from_directory
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS #comment this on deployment
 
-import backend.dataload.pgconnection
-import backend.dataload.mongoconnection
-import recipe_search
-import backend.resources.user.UserAPI
+import backend.dataload.pgconnection as pgconnection
+import backend.dataload.mongoconnection as mongoconnection
+import backend.search.recipeSearch
+import backend.resources.user as user
 
 app = Flask(__name__)
 CORS(app) #comment this on deployment
@@ -23,9 +23,9 @@ class Hello(Resource):
 
 class SearchAPI(Resource):
     def get(self):
-        recipe_array = recipe_search.build_recipe_array()
-        recipe_results = { 'recipeArray': recipe_array }
-        return recipe_results
+        recipeArray = backend.search.recipeSearch.buildRecipeArray()
+        recipeResults = { 'recipeArray': recipeArray }
+        return recipeResults
 
 class RecipeAPI(Resource):
     def get(self, id):
@@ -34,7 +34,7 @@ class RecipeAPI(Resource):
 api.add_resource(Hello, '/')
 api.add_resource(SearchAPI, '/api/search/', endpoint='search')
 api.add_resource(RecipeAPI, '/api/recipe/<int:id>', endpoint='recipe')
-api.add_resource(UserAPI, '/api/user/<int:id>', endpoint='user')
+api.add_resource(user.UserAPI, '/api/user/<int:id>', endpoint='user')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
