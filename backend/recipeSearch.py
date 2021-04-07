@@ -1,6 +1,5 @@
-from backend.dataload import mongoconnection
-from backend.dataload import pgconnection
-
+from mongoconnection import mongo_setup
+from pgconnection import pg_setup
 import psycopg2
 import pymongo
 
@@ -8,7 +7,7 @@ import pymongo
 #1. Will ingredient input always be > 0?
 #2. Will client prevent user from picking an input ingredient that is also a vetoed ingredient?
 
-pgCur = pgconnection.pg_setup()
+pgCur = pg_setup()
 userId = 1 #TODO: get this from client
 ingredientInput = [
         "basmati rice",
@@ -112,7 +111,7 @@ def isRecipeVetoed(recipe, vetoedIngredients, vetoedTechniques):
 """
 def buildRecipeArray():
 
-    recipeDb = mongoconnection.mongo_setup()
+    recipeDb = mongo_setup()
     recipeArray = []
 
     vetoedIngredients = getVetoedIngredients()
