@@ -1,5 +1,6 @@
-import backend.dataload.mongoconnection as mongoconnection
-import backend.dataload.pgconnection as pgconnection
+from backend.dataload import mongoconnection
+from backend.dataload import pgconnection
+
 import psycopg2
 import pymongo
 

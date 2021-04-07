@@ -32,7 +32,7 @@ def updateUser(userId, userName):
 
 def deleteUser(userId):
     sql = """DELETE FROM users WHERE userId = %s"""
-    
+
     return sqlHelper(sql, (userId,), "update") 
 
 def getUser(userId):

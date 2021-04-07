@@ -4,12 +4,13 @@ from flask_cors import CORS #comment this on deployment
 
 import backend.dataload.pgconnection as pgconnection
 import backend.dataload.mongoconnection as mongoconnection
-import backend.search.recipeSearch
+import backend.search.recipeSearch as recipeSearch
 import backend.resources.user as user
 
 app = Flask(__name__)
 CORS(app) #comment this on deployment
 api = Api(app)
+parser = reqparse.RequestParser()
 
 sample_mongodb_doc = mongoconnection.return_one()
 sample_pg = pgconnection.return_pg()
@@ -22,8 +23,12 @@ class Hello(Resource):
         'pgRecord' : str(sample_pg) }
 
 class SearchAPI(Resource):
-    def get(self):
-        recipeArray = backend.search.recipeSearch.buildRecipeArray()
+    def post(self):
+        parser.add_argument('userId', type=str)
+        parser.add_argument('ingredientInput', type=[str])
+        args = parser.parse_args()
+
+        recipeArray = recipeSearch.buildRecipeArray()
         recipeResults = { 'recipeArray': recipeArray }
         return recipeResults
 
