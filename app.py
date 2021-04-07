@@ -2,10 +2,10 @@ from flask import Flask, send_from_directory
 from flask_restful import Api, Resource, reqparse
 from flask_cors import CORS #comment this on deployment
 
-import backend.dataload.pgconnection as pgconnection
-import backend.dataload.mongoconnection as mongoconnection
-import backend.search.recipeSearch as recipeSearch
-import backend.resources.user as user
+import backend.pgconnection as pgconnection
+import backend.mongoconnection as mongoconnection
+import backend.recipeSearch as recipeSearch
+import backend.user as user
 
 app = Flask(__name__)
 CORS(app) #comment this on deployment
@@ -26,7 +26,7 @@ class SearchAPI(Resource):
     def post(self):
         parser.add_argument('userId', type=str)
         parser.add_argument('ingredientInput', type=[str])
-        args = parser.parse_args()
+        #TODO: UI should add userId and ingredientInput to JSON body
 
         recipeArray = recipeSearch.buildRecipeArray()
         recipeResults = { 'recipeArray': recipeArray }
