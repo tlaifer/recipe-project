@@ -7,12 +7,14 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import axios from 'axios';
 
 
 class Recipe extends React.Component {
   state = {
     recipeId: '',
     rating: '',
+    favorite: '',
     setRating: '',
   }
 
@@ -25,10 +27,28 @@ class Recipe extends React.Component {
     this.setState({ rating: event.target.rating });
   };
 
+  handleFavorite = () => { 
+    this.setState({ favorite: !favorite })
+    this.handleSubmit()
+  }
+
   handleSubmit = () => {
-    /**
-     * TODO: rating submit
-     */
+
+    axios.put('http://localhost:7000/api/rating/', {
+      userId: this.props.userId,
+      recipeId: this.state.recipeId,
+      favorite: this.state.favorite,
+      rating: this.state.rating,
+    }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      console.log("SUCCESS", response);
+    }).catch(error => {
+      console.log(error)
+    });
+
   };
 
   render() {
@@ -42,7 +62,7 @@ class Recipe extends React.Component {
         <Grid item xs={6}>Recipe Steps:</Grid>
         <Grid item xs={6}>
           <Grid item xs={6}>
-            <Button> Save to Favorites
+            <Button onClick = {this.handleFavorite}> Save to Favorites
               <FavoriteIcon/>
             </Button>
           </Grid>
@@ -56,7 +76,7 @@ class Recipe extends React.Component {
                 <FormControlLabel value="4" control={<Radio />} label="4" />
                 <FormControlLabel value="5" control={<Radio />} label="5" />
               </RadioGroup>
-              <Button type="submit" variant="outlined" color="primary">
+              <Button type="submit" variant="outlined" color="primary" onClick = {this.handleSubmit}>
                 Submit
               </Button>
             </FormControl>
