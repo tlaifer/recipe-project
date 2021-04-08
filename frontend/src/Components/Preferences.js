@@ -11,6 +11,7 @@ import Button from '@material-ui/core/Button';
 import Checkbox from '@material-ui/core/Checkbox';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import axios from 'axios';
 
 
 const submitButtonText = 'Save Changes'
@@ -66,10 +67,17 @@ class Preferences extends Component {
   }
 
   handleCreateUser = () => {
-    /**
-     * TODO: create user
-     */
-    return;
+    axios.put('http://localhost:7000/api/user/', {
+      name: this.state.newUserInputName
+    }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      console.log("SUCCESS", response);
+    }).catch(error => {
+      console.log(error)
+    });
   }
 
   handleUserChage = (event) => {
@@ -161,7 +169,7 @@ class Preferences extends Component {
             id="tags-standard"
             style={{ alignContent: "left" }}
             options={this.state.ingredients.map(ingredient => ingredient.name)}
-            // defaultValue={[state.ingredients[0].name]}
+            //defaultValue={[state.ingredients[0].name]}
             getOptionLabel={(option) => option}
             onChange={this.handleIngredientChange}
             renderInput={(params) => (
