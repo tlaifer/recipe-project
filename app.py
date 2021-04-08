@@ -26,9 +26,9 @@ class SearchAPI(Resource):
     def post(self):
         parser.add_argument('userId', type=str)
         parser.add_argument('ingredientInput', type=[str])
-        #TODO: UI should add userId and ingredientInput to JSON body
+        args = parser.parse_args()
 
-        recipeArray = recipeSearch.buildRecipeArray()
+        recipeArray = recipeSearch.buildRecipeArray(args['userId'], args['ingredientInput'])
         recipeResults = { 'recipeArray': recipeArray }
         return recipeResults
 

@@ -8,15 +8,6 @@ import pymongo
 #2. Will client prevent user from picking an input ingredient that is also a vetoed ingredient?
 
 pgCur = pg_setup()
-userId = 1 #TODO: get this from client
-ingredientInput = [
-        "basmati rice",
-        "water",
-        "salt",
-        "cinnamon stick",
-        "green cardamom pods"
-      ]
- #TODO: get this from client
 
 """ Description: Retrieves a list of the user's vetoed ingredients, saved in their user perferences.
     Returns: An array of ingrediients the user has vetoed.
@@ -109,7 +100,7 @@ def isRecipeVetoed(recipe, vetoedIngredients, vetoedTechniques):
         resulting array also include a count of specified ingredients, extra ingredients, and preferred
         techniques per recipe.
 """
-def buildRecipeArray():
+def buildRecipeArray(userId, ingredientInput):
 
     recipeDb = mongo_setup()
     recipeArray = []
@@ -148,12 +139,19 @@ def buildRecipeArray():
                 if (technique in familiarTechniques):
                     techniqueCount += 1
 
-        recipe['_id'] = str(recipe['_id']) # format string so that JSON is properly formatted
-        recipe['ingredientCount'] = ingredientCount
-        recipe['extraCount'] = extraCount
-        recipe['techniqueCount'] = techniqueCount
+        recipeObject = {}
 
-        recipeArray.append(recipe)
+        recipeObject['id'] = str(recipe['_id']) # format string so that JSON is properly formatted
+        recipeObject['name'] = recipe['recipeName']
+        recipeObject['ingredients'] = recipeIngredients
+        recipeObject['techniques'] = recipeTechniques
+        recipeObject['rating'] = 0 #TODO calculate this
+        recipeObject['cookTime'] = recipe['minutes']
+        recipeObject['ingredientCount'] = ingredientCount
+        recipeObject['extraCount'] = extraCount
+        recipeObject['techniqueCount'] = techniqueCount
+
+        recipeArray.append(recipeObject)
 
     return recipeArray
 
