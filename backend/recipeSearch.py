@@ -1,5 +1,5 @@
-from mongoconnection import mongo_setup
-from pgconnection import pg_setup
+from .mongoconnection import mongo_setup
+from .pgconnection import pg_setup
 import psycopg2
 import pymongo
 
