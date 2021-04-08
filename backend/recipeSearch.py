@@ -8,15 +8,6 @@ import pymongo
 #2. Will client prevent user from picking an input ingredient that is also a vetoed ingredient?
 
 pgCur = pg_setup()
-userId = 1 #TODO: get this from client
-ingredientInput = [
-        "basmati rice",
-        "water",
-        "salt",
-        "cinnamon stick",
-        "green cardamom pods"
-      ]
- #TODO: get this from client
 
 """ Description: Retrieves a list of the user's vetoed ingredients, saved in their user perferences.
     Returns: An array of ingrediients the user has vetoed.
@@ -109,7 +100,7 @@ def isRecipeVetoed(recipe, vetoedIngredients, vetoedTechniques):
         resulting array also include a count of specified ingredients, extra ingredients, and preferred
         techniques per recipe.
 """
-def buildRecipeArray():
+def buildRecipeArray(userId, ingredientInput):
 
     recipeDb = mongo_setup()
     recipeArray = []
@@ -154,6 +145,7 @@ def buildRecipeArray():
         recipeObject['name'] = recipe['recipeName']
         recipeObject['ingredients'] = recipeIngredients
         recipeObject['techniques'] = recipeTechniques
+        recipeObject['rating'] = 0 #TODO calculate this
         recipeObject['cookTime'] = recipe['minutes']
         recipeObject['ingredientCount'] = ingredientCount
         recipeObject['extraCount'] = extraCount
@@ -162,11 +154,3 @@ def buildRecipeArray():
         recipeArray.append(recipeObject)
 
     return recipeArray
-
-#TODO: remove this section, it is just here for testing/debugging
-def main():
-    recipeArray = buildRecipeArray()
-    return
-
-if __name__ == '__main__':
-    main()
