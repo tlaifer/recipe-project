@@ -12,7 +12,7 @@ pgCur = pg_setup()
 """ Description: Retrieves a list of the user's vetoed ingredients, saved in their user perferences.
     Returns: An array of ingrediients the user has vetoed.
 """
-def getVetoedIngredients():
+def getVetoedIngredients(userId):
 
     vetoedIngredients = []
     queryString = """SELECT vetoIngredient FROM vetoedIngredients WHERE userId = {0}""".format(userId)
@@ -37,7 +37,7 @@ def getVetoedIngredients():
         techniques.
     Returns: An array of techniques that meet the criteria of the parameter (vetoed vs preferred).
 """
-def getTechniques(vetoed):
+def getTechniques(userId,vetoed):
 
     techniques = []
     queryString = """SELECT technique FROM userTechniques WHERE userId = {0} AND isVeto = {1}""".format(userId, str(vetoed).upper())
@@ -78,7 +78,7 @@ def isEntityVetoed(user, entityArray, vetoedArray):
         will be discarded from the search results if it contains at least one vetoed ingredient or technique.
     Returns: A boolean indicating whether or not the recipe should be returned in the search results.
 """
-def isRecipeVetoed(recipe, vetoedIngredients, vetoedTechniques):
+def isRecipeVetoed(userId, recipe, vetoedIngredients, vetoedTechniques):
 
     recipeIngredients = recipe['ingredients']
     recipeTechniques = recipe['techniques']
@@ -105,9 +105,9 @@ def buildRecipeArray(userId, ingredientInput):
     recipeDb = mongo_setup()
     recipeArray = []
 
-    vetoedIngredients = getVetoedIngredients()
-    vetoedTechniques = getTechniques(True)
-    familiarTechniques = getTechniques(False)
+    vetoedIngredients = getVetoedIngredients(userId)
+    vetoedTechniques = getTechniques(userId, True)
+    familiarTechniques = getTechniques(userId, False)
 
     userHasVeto = (len(vetoedIngredients) >= 0) or (len(vetoedTechniques) >= 0)
 
@@ -122,7 +122,7 @@ def buildRecipeArray(userId, ingredientInput):
 
         # If there is at least one veto preference, check if we should veto this recipe
         if (userHasVeto == True):
-            if (isRecipeVetoed(recipe, vetoedIngredients, vetoedTechniques) == True):
+            if (isRecipeVetoed(userId, recipe, vetoedIngredients, vetoedTechniques) == True):
                 break # recipe is vetoed
 
         if (len(recipeIngredients) <= 0):
@@ -157,7 +157,7 @@ def buildRecipeArray(userId, ingredientInput):
 
 #TODO: remove this section, it is just here for testing/debugging
 def main():
-    recipeArray = buildRecipeArray()
+    recipeArray = buildRecipeArray(1,["basmati rice"])
     return
 
 if __name__ == '__main__':

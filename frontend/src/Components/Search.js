@@ -18,21 +18,7 @@ import axios from 'axios'
 const submitButtonText = 'Search'
 
 /**
- * TODO: replace with DB call to UserTechniques
- */
- let techniques = [
-  {
-    name: 'tec1',
-    value: false
-  },
-  {
-    name: 'tec2',
-    value: false
-  }
-];
-
-/**
- * TODO: replace with DB call to Ingredients & UserIngredients
+ * All possible ingredient options
  */
 let ingredients = [
   {
@@ -45,6 +31,10 @@ let ingredients = [
   }
 ]
 
+/**
+ * This is the array of recipes that meet the user's results.
+ * Comes from call to search API.
+ */
 let recipes = [
   {
     id: '1',
@@ -52,7 +42,10 @@ let recipes = [
     ingredients: ['a', 'list', 'of', 'things'],
     techniques: ['a', 'list', 'of', 'things'],
     rating: 4.7,
-    cookTime: 35
+    cookTime: 35,
+    ingredientCount: 5,
+    extraCount: 2,
+    techniqueCount: 1
   }
 ];
 class Search extends Component {
@@ -66,8 +59,8 @@ class Search extends Component {
   };
 
   handleSearch = () => {
-    var results = this.makeApiCall(this.state.searchValue);
-    this.setState({ searchResults:  results});
+    var results = this.makeApiCall(this.state.selectedIngredients); /** previous this.state.searchValue in parentheses */
+    this.setState({ searchResults: results});
     this.setState({ display: 'results'});
   }
 
@@ -79,12 +72,22 @@ class Search extends Component {
     this.setState({ display: 'search' })
   }
 
+  /** searchInput parameter is the collection of ingredients entered by the user */
   makeApiCall = (searchInput) => {
-    /**
-     * TODO: call search API
-     *
-     */
-    return recipes;
+    axios.post('http://localhost:5000/api/search/', {
+      userId: 1, 
+      ingredientInput: searchInput
+    }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      console.log("SUCCESS", response);
+      this.setState({ searchResults: response.data.recipeArray });
+    }).catch(error => {
+      console.log(error)
+    });
+    return;
   }
 
   saveFavorite = (recipeId) => {
@@ -138,10 +141,10 @@ class Search extends Component {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {recipes.map((row) => (
+                {recipes.map((row) => ( /** TODO replace recipes with this.state.searchResults */
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link href={"/recipies/" + row.id} >{row.name}</Link>
+                      <Link href={"/recipes/" + row.id} >{row.name}</Link>
                     </TableCell>
                     <TableCell align="right">{row.ingredients.join(', ')}</TableCell>
                     <TableCell align="right">{row.techniques.join(', ')}</TableCell>
