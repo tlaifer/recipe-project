@@ -23,21 +23,50 @@ class Hello(Resource):
         'mongoDbRecord' : str(sample_mongodb_doc),
         'pgRecord' : str(sample_pg) }
 
+"""
+LJ: Tali and Dominic you can ignore this.
+This is my testing function for making sure my API syntax works.
+Feel free to use it in Postman yourselves or manipulate the code if needed.
+"""
+class OneRecipeTest(Resource):
+    def post(self):
+        parser.add_argument('userId', type=str)
+        parser.add_argument('ingredientInput', type=str, action="append")
+        args = parser.parse_args()
+        
+        try:
+            recipeArray = recipeSearch.testOneRecipe(args['userId'], args['ingredientInput'])
+            recipeResults = { 'recipeArray': recipeArray }
+        except:
+            print("Count not retrieve recipe array")
+            return {'recipeArray': []}
+
+        return recipeResults
+
 class SearchAPI(Resource):
     def post(self):
         parser.add_argument('userId', type=str)
-        parser.add_argument('ingredientInput', type=[str])
+        parser.add_argument('ingredientInput', type=str, action="append")
         args = parser.parse_args()
 
-        recipeArray = recipeSearch.buildRecipeArray(args['userId'], args['ingredientInput'])
-        recipeResults = { 'recipeArray': recipeArray }
+        try:
+            recipeArray = recipeSearch.buildRecipeArray(args['userId'], args['ingredientInput'])
+            recipeResults = { 'recipeArray': recipeArray }
+        except:
+            print("Count not retrieve recipe array")
+            return {'recipeArray': []}
+
         return recipeResults
 
 class RecipeAPI(Resource):
     def get(self, id):
         return { f'message': f'retrieve recipe with id {id}' }
 
+# Test APIs
 api.add_resource(Hello, '/')
+api.add_resource(OneRecipeTest, '/api/oneRecipe/', endpoint='oneRecipe')
+
+# Real APIs
 api.add_resource(SearchAPI, '/api/search/', endpoint='search')
 api.add_resource(RecipeAPI, '/api/recipe/<int:id>', endpoint='recipe')
 api.add_resource(user.UserAPI, '/api/user/', '/api/user/<int:id>', endpoint='user')
