@@ -148,12 +148,18 @@ def buildRecipeArray():
                 if (technique in familiarTechniques):
                     techniqueCount += 1
 
-        recipe['_id'] = str(recipe['_id']) # format string so that JSON is properly formatted
-        recipe['ingredientCount'] = ingredientCount
-        recipe['extraCount'] = extraCount
-        recipe['techniqueCount'] = techniqueCount
+        recipeObject = {}
 
-        recipeArray.append(recipe)
+        recipeObject['id'] = str(recipe['_id']) # format string so that JSON is properly formatted
+        recipeObject['name'] = recipe['recipeName']
+        recipeObject['ingredients'] = recipeIngredients
+        recipeObject['techniques'] = recipeTechniques
+        recipeObject['cookTime'] = recipe['minutes']
+        recipeObject['ingredientCount'] = ingredientCount
+        recipeObject['extraCount'] = extraCount
+        recipeObject['techniqueCount'] = techniqueCount
+
+        recipeArray.append(recipeObject)
 
     return recipeArray
 
