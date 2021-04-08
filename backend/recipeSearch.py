@@ -154,3 +154,11 @@ def buildRecipeArray(userId, ingredientInput):
         recipeArray.append(recipeObject)
 
     return recipeArray
+
+#TODO: remove this section, it is just here for testing/debugging
+def main():
+    recipeArray = buildRecipeArray()
+    return
+
+if __name__ == '__main__':
+    main()
