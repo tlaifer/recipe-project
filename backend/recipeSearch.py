@@ -155,7 +155,28 @@ def buildRecipeArray(userId, ingredientInput):
 
     return recipeArray
 
-#TODO: remove this section, it is just here for testing/debugging
+
+
+
+
+""" TESTING SECTIONS """
+
+def testOneRecipe(userId, ingredientInput):
+
+    oneRecipe = [ {
+        'id': 123,
+        'name': 'Grilled Cheese',
+        'ingredients': ['bread', 'cheese', 'butter'],
+        'techniques': ['grill'],
+        'rating': 4.3,
+        'cookTime': 10,
+        'ingredientCount': 1,
+        'extraCount': 2,
+        'techniqueCount': 1
+    } ]
+
+    return oneRecipe
+
 def main():
     recipeArray = buildRecipeArray(1,["basmati rice"])
     return
