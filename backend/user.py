@@ -1,13 +1,15 @@
+import psycopg2
 from flask_restful import fields, marshal_with, reqparse, Resource
 from .pgconnection import pg_conn
 
+parser = reqparse.RequestParser()
 
 def sqlHelper(sqlStatement, inputTuple, func):
     toReturn = False
     try:
         conn = pg_conn()
         cur = conn.cursor()
-        cur.execute(sql, inputTuple)
+        cur.execute(sqlStatement, inputTuple)
         if (func == "create"):
             toReturn = cur.fetchone()[0]
         elif (func == "update" or func == "delete"):
@@ -19,35 +21,38 @@ def sqlHelper(sqlStatement, inputTuple, func):
     return toReturn
 
 
-def createUser(userName):
-    sql = """INSERT INTO users(userName)
-             VALUES(%s) RETURNING userId;"""
-    return sqlHelper(sql, (userName,), "create")
+def createUser(name):
+    sql = """INSERT INTO users(name)
+             VALUES(%s) RETURNING id;"""
+    return  {
+        "id": sqlHelper(sql, (name,), "create"),
+        "name": name
+    }
 
-def updateUser(userId, userName):
+def updateUser(id, name):
     sql = """ UPDATE users
-                SET userName = %s
-                WHERE userId = %s"""
-    return sqlHelper(sql, (userName, userId), "update")
+                SET name = %s
+                WHERE id = %s"""
+    return sqlHelper(sql, (name, name), "update")
 
-def deleteUser(userId):
-    sql = """DELETE FROM users WHERE userId = %s"""
+def deleteUser(id):
+    sql = """DELETE FROM users WHERE id = %s"""
 
-    return sqlHelper(sql, (userId,), "update") 
+    return sqlHelper(sql, (id,), "update") 
 
-def getUser(userId):
-    sql = """SELECT FROM users WHERE userId = %s"""
+def getUser(id):
+    sql = """SELECT FROM users WHERE id = %s"""
     try:
         conn = pg_conn()
         cur = conn.cursor()
-        cur.execute(sql, (userId,))
-        userRow = cursor.fetchall()
+        cur.execute(sql, (id,))
+        userRow = cur.fetchall()
     except (Exception, psycopg2.Error) as error:
         print("Error while fetching data from PostgreSQL", error)
     finally:
         if conn:
-            cursor.close()
-            connection.close()
+            cur.close()
+            conn.close()
 
 def getAllUsers():
     sql = """SELECT * FROM users"""
@@ -55,13 +60,13 @@ def getAllUsers():
         conn = pg_conn()
         cur = conn.cursor()
         cur.execute(sql)
-        userRow = cursor.fetchall()
+        userRow = cur.fetchall()
     except (Exception, psycopg2.Error) as error:
         print("Error while fetching data from PostgreSQL", error)
     finally:
         if conn:
-            cursor.close()
-            connection.close()
+            cur.close()
+            conn.close()
     
 
 class UserAPI(Resource):
@@ -69,9 +74,10 @@ class UserAPI(Resource):
     def get(self, id):
         return getUser(id)
 
-    def put(self, id):
-        # should be name, need to figure out how to pass args
-        return createUser(id)
+    def put(self):
+        parser.add_argument('name', type=str)
+        args = parser.parse_args()
+        return createUser(args.name)
 
     def delete(self, id):
         return deleteUser(id)

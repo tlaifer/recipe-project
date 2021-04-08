@@ -39,7 +39,7 @@ class RecipeAPI(Resource):
 api.add_resource(Hello, '/')
 api.add_resource(SearchAPI, '/api/search/', endpoint='search')
 api.add_resource(RecipeAPI, '/api/recipe/<int:id>', endpoint='recipe')
-api.add_resource(user.UserAPI, '/api/user/<int:id>', endpoint='user')
+api.add_resource(user.UserAPI, '/api/user/', '/api/user/<int:id>', endpoint='user')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

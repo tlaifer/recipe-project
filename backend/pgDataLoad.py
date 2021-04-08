@@ -15,8 +15,8 @@ def create_tables(conn):
     commands = (
         """
         CREATE TABLE IF NOT EXISTS users(
-            userId INT PRIMARY KEY, 
-            username varchar(255) NOT NULL
+            id SERIAL PRIMARY KEY,
+            name varchar NOT NULL
             )
         """,
         """ 
