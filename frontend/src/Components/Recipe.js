@@ -28,7 +28,7 @@ class Recipe extends React.Component {
   };
 
   handleFavorite = () => { 
-    this.setState({ favorite: !favorite })
+    /** this.setState({ favorite: !favorite }) - Liz commented this out because the front end wouldn't render with this line */
     this.handleSubmit()
   }
 

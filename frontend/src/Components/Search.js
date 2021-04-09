@@ -54,14 +54,15 @@ class Search extends Component {
 
     this.state = {
       selectedIngredients: '',
+      searchResults: '',
       display: this.props.display,
     }
   };
 
   handleSearch = () => {
-    var results = this.makeApiCall(this.state.selectedIngredients); /** previous this.state.searchValue in parentheses */
-    this.setState({ searchResults: results});
-    this.setState({ display: 'results'});
+    this.makeApiCall(this.state.selectedIngredients); /** removed var results =  */
+    /** this.setState({ searchResults: results}); */
+    this.setState({ display: 'results' });
   }
 
   handleIngredientChange = (event, value, reason) => {
@@ -74,14 +75,14 @@ class Search extends Component {
 
   /** searchInput parameter is the collection of ingredients entered by the user */
   makeApiCall = (searchInput) => {
-    axios.post('http://localhost:5000/api/search/', {
+    axios.post('http://localhost:5000/api/oneRecipe/', { /** TODO replace oneRecipe with search */
       userId: 1, 
       ingredientInput: searchInput
     }, {
       headers: {
           'Content-Type': 'application/json'
       }
-    }).then(response => {
+    }).then((response) => {
       console.log("SUCCESS", response);
       this.setState({ searchResults: response.data.recipeArray });
     }).catch(error => {
@@ -144,7 +145,7 @@ class Search extends Component {
                 {recipes.map((row) => ( /** TODO replace recipes with this.state.searchResults */
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link href={"/recipes/" + row.id} >{row.name}</Link>
+                      <Link href={"/recipes/" + row.id}>{row.name}</Link>
                     </TableCell>
                     <TableCell align="right">{row.ingredients.join(', ')}</TableCell>
                     <TableCell align="right">{row.techniques.join(', ')}</TableCell>
