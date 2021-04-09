@@ -164,7 +164,7 @@ def buildRecipeArray(userId, ingredientInput):
 def testOneRecipe(userId, ingredientInput):
 
     oneRecipe = [ {
-        'id': 123,
+        'id': 1,
         'name': 'Grilled Cheese',
         'ingredients': ['bread', 'cheese', 'butter'],
         'techniques': ['grill'],
