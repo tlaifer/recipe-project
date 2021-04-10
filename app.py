@@ -5,6 +5,7 @@ from flask_cors import CORS #comment this on deployment
 import backend.pgconnection as pgconnection
 import backend.mongoconnection as mongoconnection
 import backend.recipeSearch as recipeSearch
+import backend.ingredients as ingredients
 import backend.user as user
 import backend.rating as rating
 
@@ -65,12 +66,24 @@ class RecipeAPI(Resource):
     def get(self, id):
         return { f'message': f'retrieve recipe with id {id}' }
 
+class IngredientsAPI(Resource):
+    def get(self):
+        try:
+            ingredientArray = ingredients.getIngredients()
+            ingredientList = { 'ingredientArray': ingredientArray }
+        except:
+            print("Count not retrieve ingredient array")
+            return {'ingredientArray': []}
+
+        return ingredientList
+
 # Test APIs
 api.add_resource(Hello, '/')
 api.add_resource(OneRecipeTest, '/api/oneRecipe/', endpoint='oneRecipe')
 
 # Real APIs
 api.add_resource(SearchAPI, '/api/search/', endpoint='search')
+api.add_resource(IngredientsAPI, '/api/ingredients/', endpoint='ingredients')
 api.add_resource(RecipeAPI, '/api/recipe/<int:id>', endpoint='recipe')
 api.add_resource(user.UserAPI, '/api/user/', '/api/user/<int:id>', endpoint='user')
 api.add_resource(rating.RatingAPI, '/api/rating/', endpoint='rating')

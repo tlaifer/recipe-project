@@ -54,6 +54,7 @@ class Search extends Component {
 
     this.state = {
       selectedIngredients: '',
+      ingredientList: '',
       searchResults: '',
       display: this.props.display,
       currentRecipe: ''
@@ -101,6 +102,17 @@ class Search extends Component {
     .then((response) => {
       console.log("SUCCESS", response);
       this.setState({ currentRecipe: response.data });
+    }).catch(error => {
+      console.log(error)
+    });
+    return;
+  }
+
+  ingredientApiCall = () => { /** TODO: this should probably be props rather than state */
+    axios.get('http://localhost:5000/api/ingredients/')
+    .then((response) => {
+      console.log("SUCCESS", response);
+      this.setState({ ingredientList: response.data });
     }).catch(error => {
       console.log(error)
     });
