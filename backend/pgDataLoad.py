@@ -50,7 +50,7 @@ def create_tables(conn):
         CREATE TABLE IF NOT EXISTS ratings(
             userId INT, 
             recipeId INT,
-            rating numeric DEFAULT 0,
+            rating INT DEFAULT 0,
             favorite BOOL DEFAULT 'f',
             CONSTRAINT pk_rating PRIMARY KEY (userId,recipeId)
             )
