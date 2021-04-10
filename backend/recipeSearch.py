@@ -3,10 +3,6 @@ from .pgconnection import pg_setup
 import psycopg2
 import pymongo
 
-#TODO error handling:
-#1. Will ingredient input always be > 0?
-#2. Will client prevent user from picking an input ingredient that is also a vetoed ingredient?
-
 pgCur = pg_setup()
 
 """ Description: Retrieves a list of the user's vetoed ingredients, saved in their user perferences.
@@ -164,7 +160,7 @@ def buildRecipeArray(userId, ingredientInput):
 def testOneRecipe(userId, ingredientInput):
 
     oneRecipe = [ {
-        'id': 1,
+        'id': "6057e15ad46859706045d8cc",
         'name': 'Grilled Cheese',
         'ingredients': ['bread', 'cheese', 'butter'],
         'techniques': ['grill'],

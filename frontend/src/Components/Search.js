@@ -32,12 +32,11 @@ let ingredients = [
 ]
 
 /**
- * This is the array of recipes that meet the user's results.
- * Comes from call to search API.
+ * Test recipe array
  */
 let recipes = [
   {
-    id: '1',
+    id: '6057e15ad46859706045d8cc',
     name: 'recipe name',
     ingredients: ['a', 'list', 'of', 'things'],
     techniques: ['a', 'list', 'of', 'things'],
@@ -48,6 +47,7 @@ let recipes = [
     techniqueCount: 1
   }
 ];
+
 class Search extends Component {
   constructor(props) {
     super(props);
@@ -56,13 +56,18 @@ class Search extends Component {
       selectedIngredients: '',
       searchResults: '',
       display: this.props.display,
+      currentRecipe: ''
     }
   };
 
   handleSearch = () => {
-    this.makeApiCall(this.state.selectedIngredients); /** removed var results =  */
-    /** this.setState({ searchResults: results}); */
+    this.searchApiCall(this.state.selectedIngredients);
     this.setState({ display: 'results' });
+  }
+
+  handleRecipeLookup = (recipeId) => {
+    this.recipeApiCall(recipeId);
+    this.setState({ currentRecipe: 'results' });
   }
 
   handleIngredientChange = (event, value, reason) => {
@@ -74,8 +79,8 @@ class Search extends Component {
   }
 
   /** searchInput parameter is the collection of ingredients entered by the user */
-  makeApiCall = (searchInput) => {
-    axios.post('http://localhost:5000/api/oneRecipe/', { /** TODO replace oneRecipe with search */
+  searchApiCall = (searchInput) => {
+    axios.post('http://localhost:5000/api/search/', {
       userId: 1, 
       ingredientInput: searchInput
     }, {
@@ -85,6 +90,17 @@ class Search extends Component {
     }).then((response) => {
       console.log("SUCCESS", response);
       this.setState({ searchResults: response.data.recipeArray });
+    }).catch(error => {
+      console.log(error)
+    });
+    return;
+  }
+
+  recipeApiCall = (recipeId) => {
+    axios.get('http://localhost:5000/api/recipe/' + recipeId)
+    .then((response) => {
+      console.log("SUCCESS", response);
+      this.setState({ currentRecipe: response.data });
     }).catch(error => {
       console.log(error)
     });
@@ -134,24 +150,30 @@ class Search extends Component {
               <TableHead>
                 <TableRow>
                   <TableCell>Recipe Name</TableCell>
-                  <TableCell align="right">Ingredients</TableCell>
-                  <TableCell align="right">Techniques</TableCell>
-                  <TableCell align="right">Cooking Time</TableCell>
-                  <TableCell align="right">Average Rating</TableCell>
+                  <TableCell align="center">Ingredients</TableCell>
+                  <TableCell align="center">Techniques</TableCell>
+                  <TableCell align="center">Cooking Time</TableCell>
+                  <TableCell align="center">Average Rating</TableCell>
+                  <TableCell align="center">Specified Ingredients</TableCell>
+                  <TableCell align="center">Extra Ingredients</TableCell>
+                  <TableCell align="center">Preferred Techniques</TableCell>
                   <TableCell align="right">Add to Favorites</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {recipes.map((row) => ( /** TODO replace recipes with this.state.searchResults */
+                {Array.from(this.state.searchResults).map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row">
-                      <Link href={"/recipes/" + row.id}>{row.name}</Link>
+                      <Link onClick={this.handleRecipeLookup} href={"/recipes/" + row.id}>{row.name}</Link>
                     </TableCell>
-                    <TableCell align="right">{row.ingredients.join(', ')}</TableCell>
-                    <TableCell align="right">{row.techniques.join(', ')}</TableCell>
-                    <TableCell align="right">{row.cookTime}</TableCell>
-                    <TableCell align="right">{row.rating}</TableCell>
-                    <TableCell align="center">
+                    <TableCell align="center">{row.ingredients.join(', ')}</TableCell>
+                    <TableCell align="center">{row.techniques.join(', ')}</TableCell>
+                    <TableCell align="center">{row.cookTime}</TableCell>
+                    <TableCell align="center">{row.rating}</TableCell>
+                    <TableCell align="center">{row.ingredientCount}</TableCell>
+                    <TableCell align="center">{row.extraCount}</TableCell>
+                    <TableCell align="center">{row.techniqueCount}</TableCell>
+                    <TableCell align="right">
                       <Button onClick={this.saveFavorite(row.id)}>
                         <FavoriteIcon/>
                       </Button>
