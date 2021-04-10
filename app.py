@@ -56,7 +56,10 @@ class SearchAPI(Resource):
             print("Count not retrieve recipe array")
             return {'recipeArray': []}
 
-        return recipeResults
+        #results = Flask.make_response(jsonify(recipeResults), 200) # LJ: will handle this later when adding a header
+        #results.headers['Total-Results'] = len(recipeArray)
+
+        return recipeResults #results
 
 class RecipeAPI(Resource):
     def get(self, id):
