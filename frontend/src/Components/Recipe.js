@@ -34,7 +34,7 @@ class Recipe extends React.Component {
 
   handleSubmit = () => {
 
-    axios.put('http://localhost:7000/api/rating/', {
+    axios.put('http://localhost:5000/api/rating/', {
       userId: this.props.userId,
       recipeId: this.state.recipeId,
       favorite: this.state.favorite,

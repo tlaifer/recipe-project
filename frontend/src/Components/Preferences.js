@@ -43,21 +43,17 @@ let ingredients = [
   }
 ]
 
-let users = [
-  {
-    name: 'tali'
-  },
-  {
-    name: 'dominic'
-  }
-]
 class Preferences extends Component {
-  state = {
-    selectedUser: '',
-    techniques: techniques,
-    ingredients: ingredients,
-    allUsers: users,
-    newUserInputName: ''
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      userId: null,
+      techniques: techniques,
+      ingredients: ingredients,
+      allUsers: null,
+      newUserInputName: ''
+    };
   };
 
   handleNameChange = (event) => {
@@ -66,8 +62,40 @@ class Preferences extends Component {
     });
   }
 
+  fetchUsers = () => {
+    axios.get('http://localhost:5000/api/users/', {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      this.setState({ allUsers: response.data});
+      console.log("got users: " + JSON.stringify(this.allUsers) + JSON.stringify(response.data));
+    })
+    .catch(e => {
+      console.log(e);
+      this.setState({...this.state});
+    });
+  };
+
+  componentDidMount() {
+    this.fetchUsers();
+  };
+
+  handleDeleteUser = () => {
+    axios.delete('http://localhost:5000/api/user/' + this.state.userId)
+    .then(response => {
+      console.log("SUCCESS", response);
+      this.fetchUsers();
+    })
+    .catch(error => {
+      console.log(error)
+    });
+  }
+
+
   handleCreateUser = () => {
-    axios.put('http://localhost:7000/api/user/', {
+    axios.put('http://localhost:5000/api/user/', {
       name: this.state.newUserInputName
     }, {
       headers: {
@@ -75,6 +103,8 @@ class Preferences extends Component {
       }
     }).then(response => {
       console.log("SUCCESS", response);
+      this.fetchUsers();
+      this.state.newUserInputName = null;
     }).catch(error => {
       console.log(error)
     });
@@ -82,7 +112,7 @@ class Preferences extends Component {
 
   handleUserChage = (event) => {
     this.setState({
-      user: event.target.value
+      userId: event.target.value
     });
     /**
      * TODO: fetch user prefs
@@ -123,6 +153,7 @@ class Preferences extends Component {
   };
 
   render() {
+    console.log('render called');
     return (
       <div className="body">
         <div className="user-inputs">
@@ -130,17 +161,18 @@ class Preferences extends Component {
             <Grid item xs>Choose your user
               <Select
                 labelId="select-user"
-                value={this.user}
+                value={this.userId}
                 onChange={this.handleUserChage}
               >
-                {users.map(u => {
-                  return (<MenuItem value={u.name}>{u.name}</MenuItem>)
+                {this.state.allUsers && this.state.allUsers.map(u => {
+                  return (<MenuItem value={u.id}>{u.name}</MenuItem>)
                 })}
               </Select>
+              <Button variant="contained" color="default" onClick={this.handleDeleteUser}>delete user</Button>
             </Grid>
             <Grid item xs>
               <TextField id="user-input" label="user name" variant="outlined" type="search" value={this.newUserInputName} onChange={this.handleNameChange}/>
-              <Button variant="contained" color="default" onClick={this.handleCreateUser}>create user!</Button>
+              <Button variant="contained" color="default" onClick={this.handleCreateUser}>create user</Button>
             </Grid>
           </Grid>
         </div>
