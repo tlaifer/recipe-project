@@ -28,7 +28,7 @@ const routes = [
     inMenu: true
   },
   {
-    path: "/recipies/:recipeId",
+    path: "/recipes/:recipeId",
     name: "Recipe",
     toolbar: () => <p>Recipe</p>,
     main: (props) => <Recipe {...props}/>,

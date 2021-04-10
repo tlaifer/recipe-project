@@ -27,14 +27,16 @@ class Recipe extends React.Component {
     this.setState({ rating: event.target.rating });
   };
 
-  handleFavorite = () => { 
-    /** this.setState({ favorite: !favorite }) - Liz commented this out because the front end wouldn't render with this line */
+  handleSendToFavorite = () => { 
+    if (this.state.favorite === '') {
+      this.setState({favorite: 't'})
+    }
     this.handleSubmit()
   }
 
   handleSubmit = () => {
 
-    axios.put('http://localhost:5000/api/rating/', {
+    axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/rating/', {
       userId: this.props.userId,
       recipeId: this.state.recipeId,
       favorite: this.state.favorite,
@@ -62,7 +64,7 @@ class Recipe extends React.Component {
         <Grid item xs={6}>Recipe Steps:</Grid>
         <Grid item xs={6}>
           <Grid item xs={6}>
-            <Button onClick = {this.handleFavorite}> Save to Favorites
+            <Button onClick = {this.handleSendToFavorite}> Save to Favorites
               <FavoriteIcon/>
             </Button>
           </Grid>

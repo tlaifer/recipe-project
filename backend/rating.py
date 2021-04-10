@@ -79,10 +79,14 @@ class RatingAPI(Resource):
 
         #can't rely on default value in pg for some reason
         #also appears that anything that isn't null is true somehow
-        fav = args['favorite'] if args['favorite'] else False
-        rating = args['rating'] if args['rating'] > 0  else 0
+        userId = args['userId'] if args['userId'] is not None else 1
+        fav = args['favorite'] if args['favorite'] is not None else False
+        rating = args['rating'] if args['rating'] is not None  else 0
+
+        final_args = (userId, args['recipeId'], rating, fav)
+        print(final_args)
         
-        return upsertRating((args['userId'], args['recipeId'], rating, fav))
+        return upsertRating(final_args)
 
     def get(self):
         parser.add_argument('userId', type=int)
