@@ -63,7 +63,7 @@ class Preferences extends Component {
   }
 
   fetchUsers = () => {
-    axios.get('http://localhost:5000/api/users/', {
+    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/users/', {
       headers: {
           'Content-Type': 'application/json'
       }
@@ -83,7 +83,7 @@ class Preferences extends Component {
   };
 
   handleDeleteUser = () => {
-    axios.delete('http://localhost:5000/api/user/' + this.state.userId)
+    axios.delete('http://sp21-cs411-13.cs.illinois.edu:5000/api/user/' + this.state.userId)
     .then(response => {
       console.log("SUCCESS", response);
       this.fetchUsers();
@@ -95,7 +95,7 @@ class Preferences extends Component {
 
 
   handleCreateUser = () => {
-    axios.put('http://localhost:5000/api/user/', {
+    axios.put('http://sp21-cs411-13.cs.illinois.edu:5000/api/user/', {
       name: this.state.newUserInputName
     }, {
       headers: {

@@ -137,7 +137,7 @@ def buildRecipeArray(userId, ingredientInput):
 
         recipeObject = {}
 
-        recipeObject['id'] = str(recipe['_id']) # format string so that JSON is properly formatted
+        recipeObject['id'] = recipe['recipeId'] # format string so that JSON is properly formatted
         recipeObject['name'] = recipe['recipeName']
         recipeObject['ingredients'] = recipeIngredients
         recipeObject['techniques'] = recipeTechniques

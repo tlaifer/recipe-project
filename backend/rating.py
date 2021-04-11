@@ -79,6 +79,7 @@ class RatingAPI(Resource):
 
         #can't rely on default value in pg for some reason
         #also appears that anything that isn't null is true somehow
+        #set default user if none passed in since front 
         userId = args['userId'] if args['userId'] is not None else 1
         fav = args['favorite'] if args['favorite'] is not None else False
         rating = args['rating'] if args['rating'] is not None  else 0

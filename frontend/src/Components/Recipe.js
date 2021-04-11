@@ -24,13 +24,11 @@ class Recipe extends React.Component {
   }
 
   handleRadioChange = (event) => {
-    this.setState({ rating: event.target.rating });
+    this.setState({ rating: event.target.value });
   };
 
   handleSendToFavorite = () => { 
-    if (this.state.favorite === '') {
-      this.setState({favorite: 't'})
-    }
+    this.setState({favorite: 't'})
     this.handleSubmit()
   }
 

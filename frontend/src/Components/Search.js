@@ -82,7 +82,7 @@ class Search extends Component {
 
   /** searchInput parameter is the collection of ingredients entered by the user */
   searchApiCall = (searchInput) => {
-    axios.post('http://localhost:5000/api/search/', {
+    axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/search/', {
       userId: 1, 
       ingredientInput: searchInput
     }, {
@@ -99,7 +99,7 @@ class Search extends Component {
   }
 
   recipeApiCall = (recipeId) => {
-    axios.get('http://localhost:5000/api/recipe/' + recipeId)
+    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/recipe/' + recipeId)
     .then((response) => {
       console.log("SUCCESS", response);
       this.setState({ currentRecipe: response.data });
@@ -110,7 +110,7 @@ class Search extends Component {
   }
 
   ingredientApiCall = () => { /** TODO: this should probably be props rather than state */
-    axios.get('http://localhost:5000/api/ingredients/')
+    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/ingredients/')
     .then((response) => {
       console.log("SUCCESS", response);
       this.setState({ ingredientList: response.data.ingredientArray });

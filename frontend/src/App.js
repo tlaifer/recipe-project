@@ -8,7 +8,7 @@ function App(props, state) {
   const [getMessage, setGetMessage] = useState({})
 
   useEffect(()=>{
-    axios.get('http://localhost:5000/').then(response => {
+    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000').then(response => {
       console.log("SUCCESS", response)
       setGetMessage(response)
     }).catch(error => {
