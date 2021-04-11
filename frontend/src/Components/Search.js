@@ -57,7 +57,8 @@ class Search extends Component {
       searchResults: '',
       display: this.props.display,
       currentRecipe: '',
-      ingredientList: ''
+      ingredientList: '',
+      ingredientsFetched: false
     }
   };
 
@@ -112,7 +113,7 @@ class Search extends Component {
     axios.get('http://localhost:5000/api/ingredients/')
     .then((response) => {
       console.log("SUCCESS", response);
-      this.setState({ ingredientList: response.data });
+      this.setState({ ingredientList: response.data.ingredientArray });
     }).catch(error => {
       console.log(error)
     });
@@ -128,6 +129,10 @@ class Search extends Component {
 
   render() {
     if (this.state.display === 'search') {
+      if (this.state.ingredientsFetched === false) {
+        this.ingredientApiCall()
+        this.setState({ ingredientsFetched: true });
+      }
       return (
         <div className = 'body'>
           <h1> Ready to search for your next meal? </h1>
@@ -136,7 +141,7 @@ class Search extends Component {
               multiple
               id="tags-standard"
               style={{ alignContent: "left" }}
-              options={ingredients.map(ingredient => ingredient.name)}
+              options={Array.from(this.state.ingredientList).map(ingredient => ingredient.name)}
               getOptionLabel={(option) => option}
               onChange={(event,value, reason) => this.handleIngredientChange(event, value, reason)}
               renderInput={(params) => (
