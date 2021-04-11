@@ -18,7 +18,7 @@ const submitButtonText = 'Save Changes'
 /**
  * TODO: replace with DB call to UserTechniques
  */
-let techniques = [
+let techniquesInit = [
   {
     name: 'tec1',
     value: false
@@ -49,8 +49,8 @@ class Preferences extends Component {
     super(props);
     this.state = {
       userId: null,
-      techniques: techniques,
-      ingredients: ingredients,
+      techniques: [],
+      ingredients: [],
       allUsers: null,
       newUserInputName: '',
       optionsFetched: false
@@ -94,9 +94,27 @@ class Preferences extends Component {
     return;
   }
 
+  techniquesApiCall = () => { /** TODO: this should probably be props rather than state */
+    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/techniques/')
+    .then((response) => {
+      console.log("SUCCESS", response);
+      this.setState({ techniques: response.data.techniqueArray });
+    }).catch(error => {
+      console.log(error)
+    });
+    return;
+  }
+
   handleIngredientLoad = () => {
     if (this.state.optionsFetched === false) {
       this.ingredientApiCall()
+      this.setState({ optionsFetched: true });
+    }
+  }
+
+  handleTechniqueLoad = () => {
+    if (this.state.optionsFetched === false) {
+      this.techniquesApiCall()
       this.setState({ optionsFetched: true });
     }
   }
@@ -140,13 +158,13 @@ class Preferences extends Component {
   }
 
   handleTechniqueChange = (event) => {
-    let index = techniques.findIndex(element => {
+    let index = this.state.techniques.findIndex(element => {
       return element.name === event.target.name;
     });
-    techniques[index].value = event.target.checked
+    this.state.techniques[index].value = event.target.checked
 
     this.setState({
-      techniques: techniques
+      techniques: this.state.techniques
     });
   };
 
@@ -154,14 +172,14 @@ class Preferences extends Component {
     //value will contain the list of currently selected options
     let selectedIngredients = value;
 
-    ingredients.forEach(ingredient => {
-      if (selectedIngredients.indexOf(ingredient.name) > -1) {
-        ingredient.value = true;
+    this.state.ingredients.forEach(ingredient => {
+      if (selectedIngredients.indexOf(this.state.ingredients.name) > -1) {
+        this.state.ingredients.value = true;
       } else {
-        ingredient.value = false
+        this.state.ingredients.value = false
       }
     });
-    this.setState({ ingredients: ingredients });
+    this.setState({ ingredients: this.state.ingredients });
   };
 
   handleSubmitPreferences = () => {
@@ -173,6 +191,7 @@ class Preferences extends Component {
 
   render() {
     this.handleIngredientLoad()
+    this.handleTechniqueLoad()
     console.log('render called');
     return (
       <div className="body">
@@ -200,7 +219,7 @@ class Preferences extends Component {
           <FormControl component="fieldset">
             <FormLabel component="legend">What can you do in the kitchen?</FormLabel>
             <FormGroup>
-              {this.state.techniques.map(t=>{
+              {Array.from(this.state.techniques).map(t=>{
                 return (
                   <FormControlLabel
                     control={<Checkbox
