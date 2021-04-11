@@ -52,7 +52,8 @@ class Preferences extends Component {
       techniques: techniques,
       ingredients: ingredients,
       allUsers: null,
-      newUserInputName: ''
+      newUserInputName: '',
+      optionsFetched: false
     };
   };
 
@@ -81,6 +82,24 @@ class Preferences extends Component {
   componentDidMount() {
     this.fetchUsers();
   };
+
+  ingredientApiCall = () => { /** TODO: this should probably be props rather than state */
+    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/ingredients/')
+    .then((response) => {
+      console.log("SUCCESS", response);
+      this.setState({ ingredients: response.data.ingredientArray });
+    }).catch(error => {
+      console.log(error)
+    });
+    return;
+  }
+
+  handleIngredientLoad = () => {
+    if (this.state.optionsFetched === false) {
+      this.ingredientApiCall()
+      this.setState({ optionsFetched: true });
+    }
+  }
 
   handleDeleteUser = () => {
     axios.delete('http://sp21-cs411-13.cs.illinois.edu:5000/api/user/' + this.state.userId)
@@ -153,6 +172,7 @@ class Preferences extends Component {
   };
 
   render() {
+    this.handleIngredientLoad()
     console.log('render called');
     return (
       <div className="body">
@@ -200,7 +220,7 @@ class Preferences extends Component {
             multiple
             id="tags-standard"
             style={{ alignContent: "left" }}
-            options={this.state.ingredients.map(ingredient => ingredient.name)}
+            options={Array.from(this.state.ingredients).map(ingredient => ingredient.name)}
             //defaultValue={[state.ingredients[0].name]}
             getOptionLabel={(option) => option}
             onChange={this.handleIngredientChange}
