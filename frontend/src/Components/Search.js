@@ -80,6 +80,13 @@ class Search extends Component {
     this.setState({ display: 'search' })
   }
 
+  handleIngredientLoad = () => {
+    if (this.state.ingredientsFetched === false) {
+      this.ingredientApiCall()
+      this.setState({ ingredientsFetched: true });
+    }
+  }
+
   /** searchInput parameter is the collection of ingredients entered by the user */
   searchApiCall = (searchInput) => {
     axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/search/', {
@@ -129,10 +136,7 @@ class Search extends Component {
 
   render() {
     if (this.state.display === 'search') {
-      if (this.state.ingredientsFetched === false) {
-        this.ingredientApiCall()
-        this.setState({ ingredientsFetched: true });
-      }
+      this.handleIngredientLoad()
       return (
         <div className = 'body'>
           <h1> Ready to search for your next meal? </h1>
