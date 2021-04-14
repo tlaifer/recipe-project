@@ -1,4 +1,7 @@
 from .pgconnection import pg_setup
+from flask import jsonify
+from flask_restful import fields, marshal_with, reqparse, Resource
+
 pgCur = pg_setup()
 
 def getTechniques():
@@ -18,3 +21,14 @@ def getTechniques():
             techniques.append({ 'name': row[0], 'value': False })
 
     return techniques
+
+class TechniquesAPI(Resource):
+    def get(self):
+        try:
+            techniqueArray = getTechniques()
+            techniqueList = { 'techniqueArray': techniqueArray }
+        except:
+            print("Count not retrieve techniques array")
+            return {'techniqueArray': []}
+
+        return techniqueList

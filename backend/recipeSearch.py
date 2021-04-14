@@ -1,9 +1,11 @@
 from .mongoconnection import mongo_setup
 from .pgconnection import pg_setup
+from flask_restful import Api, Resource, reqparse
 import psycopg2
 import pymongo
 
 pgCur = pg_setup()
+parser = reqparse.RequestParser()
 
 """ Description: Retrieves a list of the user's vetoed ingredients, saved in their user perferences.
     Returns: An array of ingrediients the user has vetoed.
@@ -106,7 +108,7 @@ def buildRecipeArray(userId, ingredientInput):
     vetoedTechniques = getTechniques(userId, True)
     familiarTechniques = getTechniques(userId, False)
 
-    userHasVeto = (len(vetoedIngredients) >= 0) or (len(vetoedTechniques) >= 0)
+    #userHasVeto = (len(vetoedIngredients) >= 0) or (len(vetoedTechniques) >= 0)
 
     #for recipe in recipeDb.find({'ingredients': {'$in': ingredientInput}}):
     for recipe in recipeDb.aggregate([ 
@@ -119,7 +121,7 @@ def buildRecipeArray(userId, ingredientInput):
         }}
     ]):
 
-        if (recipeCount > 100):
+        if (recipeCount > 500):
             break
 
         # Initialize variables
@@ -129,10 +131,12 @@ def buildRecipeArray(userId, ingredientInput):
         extraCount = 0
         techniqueCount = 0
 
+        # 4/12 UPDATE: Liz commented out this section because the mongo query excludes vetoed
+        #     ingredients and techniques.
         # If there is at least one veto preference, check if we should veto this recipe
-        if (userHasVeto == True):
-            if (isRecipeVetoed(userId, recipe, vetoedIngredients, vetoedTechniques) == True):
-                break # recipe is vetoed
+        #if (userHasVeto == True):
+        #    if (isRecipeVetoed(userId, recipe, vetoedIngredients, vetoedTechniques) == True):
+        #        break # recipe is vetoed
 
         if (len(recipeIngredients) <= 0):
             break # recipe has no ingredients. should not happen, but checking just in case
@@ -193,3 +197,19 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+class SearchAPI(Resource):
+    def post(self):
+        parser.add_argument('userId', type=str)
+        parser.add_argument('ingredientInput', type=str, action="append")
+        args = parser.parse_args()
+
+        try:
+            recipeArray = buildRecipeArray(args['userId'], args['ingredientInput'])
+            recipeResults = { 'recipeArray': recipeArray }
+        except:
+            print("Count not retrieve recipe array")
+            return {'recipeArray': []}
+
+        return recipeResults

@@ -105,6 +105,23 @@ class Search extends Component {
     return;
   }
 
+  sortApiCall = sortVariableInput => () => {
+    axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/recipeSort/', {
+      sortVariable: sortVariableInput, 
+      recipeArray: this.state.searchResults
+    }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }).then((response) => {
+      console.log("SUCCESS", response);
+      this.setState({ searchResults: response.data.sortedArray });
+    }).catch(error => {
+      console.log(error)
+    });
+    return;
+  }
+
   recipeApiCall = (recipeId) => {
     axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/recipe/' + recipeId)
     .then((response) => {
@@ -165,6 +182,11 @@ class Search extends Component {
     } else {
       return (
         <div className = 'body'>
+          <div>
+            <Button variant="contained" color="primary" onClick={this.sortApiCall('ingredientCount')}>Sort by Selected Ingredients</Button>
+            <Button variant="contained" color="primary" onClick={this.sortApiCall('extraCount')}>Sort by Fewest Extra Ingredients</Button>
+            <Button variant="contained" color="primary" onClick={this.sortApiCall('techniqueCount')}>Sort by Preferred Techniques</Button>
+          </div>
           <Button variant="contained" color="primary" onClick={this.handleBack}>New Search</Button>
           <TableContainer component={Paper}>
             <Table className="table" aria-label="simple table">

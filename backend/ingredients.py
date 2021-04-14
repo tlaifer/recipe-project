@@ -1,4 +1,7 @@
 from .pgconnection import pg_setup
+from flask import jsonify
+from flask_restful import fields, marshal_with, reqparse, Resource
+
 pgCur = pg_setup()
 
 def getIngredients():
@@ -18,3 +21,14 @@ def getIngredients():
             ingredients.append({ 'name': row[0], 'value': False })
 
     return ingredients
+
+class IngredientsAPI(Resource):
+    def get(self):
+        try:
+            ingredientArray = getIngredients()
+            ingredientList = { 'ingredientArray': ingredientArray }
+        except:
+            print("Count not retrieve ingredient array")
+            return {'ingredientArray': []}
+
+        return ingredientList
