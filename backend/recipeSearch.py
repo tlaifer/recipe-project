@@ -100,6 +100,7 @@ def buildRecipeArray(userId, ingredientInput):
 
     recipeDb = mongo_setup()
     recipeArray = []
+    recipeCount = 0
 
     vetoedIngredients = getVetoedIngredients(userId)
     vetoedTechniques = getTechniques(userId, True)
@@ -107,7 +108,19 @@ def buildRecipeArray(userId, ingredientInput):
 
     userHasVeto = (len(vetoedIngredients) >= 0) or (len(vetoedTechniques) >= 0)
 
-    for recipe in recipeDb.find({'ingredients': {'$in': ingredientInput}}):
+    #for recipe in recipeDb.find({'ingredients': {'$in': ingredientInput}}):
+    for recipe in recipeDb.aggregate([ 
+        {'$match': {
+            '$and': [
+                {'ingredients': {'$in': ingredientInput}},
+                {'ingredients': {'$nin': vetoedIngredients}},
+                {'techniques': {'$nin': vetoedTechniques}}
+            ]
+        }}
+    ]):
+
+        if (recipeCount > 100):
+            break
 
         # Initialize variables
         recipeIngredients = recipe['ingredients']
@@ -148,6 +161,7 @@ def buildRecipeArray(userId, ingredientInput):
         recipeObject['techniqueCount'] = techniqueCount
 
         recipeArray.append(recipeObject)
+        recipeCount += 1
 
     return recipeArray
 
