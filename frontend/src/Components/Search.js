@@ -105,7 +105,6 @@ class Search extends Component {
     return;
   }
 
-  /**sortApiCall = (sortVariableInput) => { */
   sortApiCall = sortVariableInput => () => {
     axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/recipeSort/', {
       sortVariable: sortVariableInput, 
