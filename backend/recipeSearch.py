@@ -212,4 +212,4 @@ class SearchAPI(Resource):
             print("Count not retrieve recipe array")
             return {'recipeArray': []}
 
-        return recipeResults #results
+        return recipeResults
