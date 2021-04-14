@@ -7,6 +7,7 @@ import backend.mongoconnection as mongoconnection
 import backend.ingredients as ingredients
 import backend.techniques as techniques
 import backend.recipeSearch as recipeSearch
+import backend.recipeSort as recipeSort
 import backend.user as user
 import backend.rating as rating
 
@@ -45,58 +46,21 @@ class OneRecipeTest(Resource):
 
         return recipeResults
 
-class SearchAPI(Resource):
-    def post(self):
-        parser.add_argument('userId', type=str)
-        parser.add_argument('ingredientInput', type=str, action="append")
-        args = parser.parse_args()
-
-        try:
-            recipeArray = recipeSearch.buildRecipeArray(args['userId'], args['ingredientInput'])
-            recipeResults = { 'recipeArray': recipeArray }
-        except:
-            print("Count not retrieve recipe array")
-            return {'recipeArray': []}
-
-        #results = Flask.make_response(jsonify(recipeResults), 200) # LJ: will handle this later when adding a header
-        #results.headers['Total-Results'] = len(recipeArray)
-
-        return recipeResults #results
-
 class RecipeAPI(Resource):
     def get(self, id):
         return { f'message': f'retrieve recipe with id {id}' }
-
-class IngredientsAPI(Resource):
-    def get(self):
-        try:
-            ingredientArray = ingredients.getIngredients()
-            ingredientList = { 'ingredientArray': ingredientArray }
-        except:
-            print("Count not retrieve ingredient array")
-            return {'ingredientArray': []}
-
-        return ingredientList
-
-class TechniquesAPI(Resource):
-    def get(self):
-        try:
-            techniqueArray = techniques.getTechniques()
-            techniqueList = { 'techniqueArray': techniqueArray }
-        except:
-            print("Count not retrieve techniques array")
-            return {'techniqueArray': []}
-
-        return techniqueList
 
 # Test APIs
 api.add_resource(Hello, '/')
 api.add_resource(OneRecipeTest, '/api/oneRecipe/', endpoint='oneRecipe')
 
-# Recipe Information
-api.add_resource(SearchAPI, '/api/search/', endpoint='search')
-api.add_resource(IngredientsAPI, '/api/ingredients/', endpoint='ingredients')
-api.add_resource(TechniquesAPI, '/api/techniques/', endpoint='techniques')
+# Searching
+api.add_resource(recipeSearch.SearchAPI, '/api/search/', endpoint='search')
+api.add_resource(recipeSort.RecipeSortAPI, '/api/recipeSort/', endpoint='recipeSort')
+
+# Static Info
+api.add_resource(ingredients.IngredientsAPI, '/api/ingredients/', endpoint='ingredients')
+api.add_resource(techniques.TechniquesAPI, '/api/techniques/', endpoint='techniques')
 api.add_resource(RecipeAPI, '/api/recipe/<int:id>', endpoint='recipe')
 
 # User Information
