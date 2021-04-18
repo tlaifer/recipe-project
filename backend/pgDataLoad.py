@@ -22,22 +22,15 @@ def create_tables(conn):
         """ 
         CREATE TABLE IF NOT EXISTS vetoedIngredients (
                 id INT PRIMARY KEY,
-                userId INT,
+                userid INT,
                 vetoIngredient INT
-                )
-        """,
-        """ 
-        CREATE TABLE IF NOT EXISTS userTechniques (
-                id INT PRIMARY KEY,
-                userId INT,
-                technique INT,
-                isVeto BOOL
                 )
         """,
         """
         CREATE TABLE IF NOT EXISTS ingredients(
             ingredientId INT PRIMARY KEY, 
-            ingredientName varchar(255) NOT NULL
+            ingredientName varchar(255) NOT NULL,
+            common BOOL
             )
         """, 
         """
@@ -46,6 +39,14 @@ def create_tables(conn):
             techniqueName varchar(255) NOT NULL
             )
         """, 
+        """ 
+        CREATE TABLE IF NOT EXISTS usertechniques (
+                userid INT REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+                technique INT REFERENCES techniques(techniqueid) ON UPDATE CASCADE,
+                isVeto BOOL,
+                CONSTRAINT userTechniques_pkey PRIMARY KEY (userid, technique)
+                )
+        """,
         """
         CREATE TABLE IF NOT EXISTS ratings(
             userId INT, 

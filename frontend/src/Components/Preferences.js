@@ -15,6 +15,7 @@ import axios from 'axios';
 
 
 const submitButtonText = 'Save Changes'
+const colSize = 20;
 /**
  * TODO: replace with DB call to UserTechniques
  */
@@ -98,7 +99,20 @@ class Preferences extends Component {
     axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/techniques/')
     .then((response) => {
       console.log("SUCCESS", response);
-      this.setState({ techniques: response.data.techniqueArray });
+      var techniques = response.data.techniqueArray;
+      
+      // chunks techniques into columns
+      var chunkedTechniques = techniques.reduce((resultArr, item, i) => {
+        var chunkIndex = Math.floor(i/colSize);
+        if (! resultArr[chunkIndex]) {
+            resultArr[chunkIndex] = [];
+        }
+        resultArr[chunkIndex].push(item);
+        return resultArr;
+      }, []);
+
+      this.setState({ techniques:  techniques});
+      this.setState({ chunkedTechniques:  chunkedTechniques});
     }).catch(error => {
       console.log(error)
     });
@@ -218,6 +232,7 @@ class Preferences extends Component {
         <Grid container spacing={3}>
           <FormControl component="fieldset">
             <FormLabel component="legend">What can you do in the kitchen?</FormLabel>
+
             <FormGroup>
               {Array.from(this.state.techniques).map(t=>{
                 return (

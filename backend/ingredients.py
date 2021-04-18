@@ -4,10 +4,13 @@ from flask_restful import fields, marshal_with, reqparse, Resource
 
 pgCur = pg_setup()
 
-def getIngredients():
+def getIngredients(common=True):
 
     ingredients = []
-    queryString = """SELECT DISTINCT ingredientName FROM ingredients ORDER BY ingredientName"""
+    if common == False:
+        queryString = """SELECT DISTINCT ingredientName FROM ingredients ORDER BY ingredientName"""
+    else:
+        queryString = """SELECT DISTINCT ingredientName FROM ingredients WHERE common = 't' ORDER BY ingredientName"""
 
     try:
         pgCur.execute(queryString)
