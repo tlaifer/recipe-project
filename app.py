@@ -10,6 +10,7 @@ import backend.recipeSearch as recipeSearch
 import backend.recipeSort as recipeSort
 import backend.user as user
 import backend.rating as rating
+import backend.vetoIngredients as vetoIngredients
 
 app = Flask(__name__)
 CORS(app) #comment this on deployment
@@ -67,6 +68,8 @@ api.add_resource(RecipeAPI, '/api/recipe/<int:id>', endpoint='recipe')
 api.add_resource(user.UserAPI, '/api/user/', '/api/user/<int:id>', endpoint='user')
 api.add_resource(rating.RatingAPI, '/api/rating/', endpoint='rating')
 api.add_resource(user.UsersAPI, '/api/users/', endpoint='users')
+api.add_resource(vetoIngredients.VetoIngredientsAPI, '/api/vetoIngredients/', endpoint='vetoIngredients')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

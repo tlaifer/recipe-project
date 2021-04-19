@@ -21,10 +21,10 @@ def create_tables(conn):
         """,
         """ 
         CREATE TABLE IF NOT EXISTS vetoedIngredients (
-                id INT PRIMARY KEY,
-                userid INT,
-                vetoIngredient INT
-                )
+            userId INT,
+            vetoIngredient INT,
+            CONSTRAINT pk_rating PRIMARY KEY (userId,vetoIngredient)
+            )
         """,
         """
         CREATE TABLE IF NOT EXISTS ingredients(
@@ -146,8 +146,11 @@ def doDataLoad():
 
     printAllTables(pgconnection.pg_conn().cursor())
 
+    print("loading ratings...")
     copy_from_file(pgconnection.pg_conn(), loadRatingsDf(), "ratings")
+    print("loading techniques...")
     copy_from_file(pgconnection.pg_conn(), loadTechniquesDf(), "techniques")
+    print("loading ingredients...")
     copy_from_file(pgconnection.pg_conn(), loadIngredientsDf(), "ingredients")
 
     print("inserted data to tables")

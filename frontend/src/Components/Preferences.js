@@ -196,10 +196,48 @@ class Preferences extends Component {
     this.setState({ ingredients: this.state.ingredients });
   };
 
+  handleIngredientSave = () => {
+    axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/vetoIngredients/', {
+      userId: this.state.userId,
+      vetoIngredients: this.state.ingredients,
+    }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      console.log("SUCCESS", response);
+    }).catch(error => {
+      console.log(error)
+    });
+  }
+
+  /*
+  TODO: uncomment when endpoint is defined
+  
+  handleTechniqueSave = () => {
+    axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/technique/', {
+      userId: this.state.userId,
+      techniques: this.state.techniques,
+    }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      console.log("SUCCESS", response);
+    }).catch(error => {
+      console.log(error)
+    });
+  }
+  */
+
   handleSubmitPreferences = () => {
-    /**
-     * TODO: submit user preferences to server
-     */
+    // First upsert vetoed ingredients
+    console.log(this.state.ingredients)
+    this.handleIngredientSave()
+
+    // Second upsert user technique selections
+    //this.handleTechniqueSave()
+
     return;
   };
 
