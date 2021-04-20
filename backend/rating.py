@@ -65,7 +65,29 @@ def deleteRating(inputTuple):
         if conn:
             cur.close()
             conn.close()
-    return success    
+    return success
+
+def recalculateAverageRating(recipeId):
+
+    averageRating = 0
+    sql = """SELECT AVG(rating) AS 'averageRating' FROM ratings WHERE ratings.recipeId = %s"""
+
+    try:
+        conn = pg_conn()
+        cur = conn.cursor()
+        cur.execute(sql, recipeId)
+        avg = cur.fetchone()
+        averageRating = avg['averageRating']
+
+    except (Exception, psycopg2.Error) as error:
+        print("Error while fetching data from PostgreSQL", error)
+
+    finally:
+        if conn:
+            cur.close()
+            conn.close()
+
+    return averageRating
     
 
 class RatingAPI(Resource):
@@ -86,6 +108,8 @@ class RatingAPI(Resource):
 
         final_args = (userId, args['recipeId'], rating, fav)
         print(final_args)
+
+        #TODO: recalculate/insert new average rating
         
         return upsertRating(final_args)
 
@@ -100,5 +124,3 @@ class RatingAPI(Resource):
         parser.add_argument('recipeId', type=int)
         args = parser.parse_args()
         return deleteRating((args['userId'], args['recipeId']))
-
-
