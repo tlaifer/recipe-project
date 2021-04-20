@@ -5,7 +5,7 @@ recipeDb = mongo_setup()
 def indexIngredients():
 
     # Index ingredients in ascending order
-    recipeDb.create_index( [ ('$ingredients', 1) ] )
+    recipeDb.create_index( [ ('ingredients', 1) ] )
     print("Ingredients indexed!")
 
     return
@@ -20,4 +20,4 @@ def addRatings():
     return
 
 if __name__ == "__main__":
-    indexIngredients()
+    #indexIngredients()
