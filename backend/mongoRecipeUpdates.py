@@ -1,4 +1,5 @@
 from mongoconnection import mongo_setup
+import pymongo
 
 recipeDb = mongo_setup()
 
@@ -12,12 +13,24 @@ def indexIngredients():
 
 def addRatings():
 
-    for recipe in recipeDb.find():
-        recipe.update( { '$set': { '$averageRating': 0 } } )
+    #for recipe in recipeDb.find():
+    #    recipe.update( { '$set': { '$averageRating': 0 } } )
 
+    recipeDb.update_many({'recipeId': {'$gt': 0}}, {'$set': { 'averageRating': 0 }} )
     print("Added average rating value to recipes!")
 
     return
 
+def addRatingsTest():
+
+        #recipeDb.update_one({'recipeId': 139209}, {'$set': { 'averageRating': 0 }} )
+        #recipeDb.update_many({'recipeId': {'$eq': 338892}}, {'$set': { 'averageRating': 0 }} )
+        for recipe in recipeDb.find({'recipeId': 79246}):
+            print(recipe)
+
+        return
+
 if __name__ == "__main__":
     #indexIngredients()
+    addRatingsTest()
+    #addRatings()

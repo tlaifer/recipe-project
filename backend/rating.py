@@ -67,7 +67,7 @@ def deleteRating(inputTuple):
             conn.close()
     return success
 
-def recalculateAverageRating(recipeId):
+def calculateAverageRating(recipeId):
 
     averageRating = 0
     sql = """SELECT AVG(rating) AS 'averageRating' FROM ratings WHERE ratings.recipeId = %s"""
@@ -109,7 +109,8 @@ class RatingAPI(Resource):
         final_args = (userId, args['recipeId'], rating, fav)
         print(final_args)
 
-        #TODO: recalculate/insert new average rating
+        #averageRating = calculateAverageRating(args['recipeId'])
+        #TODO: add this average rating to mongo db
         
         return upsertRating(final_args)
 

@@ -82,7 +82,7 @@ def buildRecipeArray(userId, ingredientInput):
         }}
     ]):
 
-        if (recipeCount > 500):
+        if (recipeCount > 200):
             break
 
         # Initialize variables
@@ -112,7 +112,7 @@ def buildRecipeArray(userId, ingredientInput):
         recipeObject['name'] = recipe['recipeName']
         recipeObject['ingredients'] = recipeIngredients
         recipeObject['techniques'] = recipeTechniques
-        recipeObject['rating'] = 0 #TODO calculate this
+        recipeObject['averageRating'] = recipe['averageRating']
         recipeObject['cookTime'] = recipe['minutes']
         recipeObject['ingredientCount'] = ingredientCount
         recipeObject['extraCount'] = extraCount
