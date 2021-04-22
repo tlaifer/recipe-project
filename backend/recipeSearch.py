@@ -54,42 +54,6 @@ def getTechniques(userId,vetoed):
 
     return techniques
 
-""" Description: Evaluates whether a recipe contains a vetoed ingredient or technique.
-    Returns: A boolean indicating whether or not the recipe contains a vetoed ingredient or technique.
-"""
-def isEntityVetoed(user, entityArray, vetoedArray):
-
-    if (len(entityArray) <= 0): # nothing is vetoed
-        return False
-
-    vetoed = False
-    vetoedArray = None
-
-    for entity in entityArray:
-        if (entity in vetoedArray):
-            vetoed = True
-            break
-
-    return vetoed
-
-""" Description: Evaluates whether a recipe should be discarded from the user's recipe search. A recipe
-        will be discarded from the search results if it contains at least one vetoed ingredient or technique.
-    Returns: A boolean indicating whether or not the recipe should be returned in the search results.
-"""
-def isRecipeVetoed(userId, recipe, vetoedIngredients, vetoedTechniques):
-
-    recipeIngredients = recipe['ingredients']
-    recipeTechniques = recipe['techniques']
-
-    if (len(vetoedIngredients) > 0): # if user has vetoed an ingredient
-        if (isEntityVetoed(userId, recipeIngredients, vetoedIngredients) == True):
-            return True
-    elif (len(vetoedTechniques) > 0): # if user has vetoed a technique
-        if (isEntityVetoed(userId, recipeTechniques, vetoedTechniques) == True):
-            return True
-
-    return False
-
 """ Description: Function to sort through all recipes and build an array of recipes that meet the user's
         search criteria. The function evaluates all recipes that contain at least one ingredient that the
         user specified, discards recipes that contain a vetoed ingredient or technique, and adds the
@@ -108,9 +72,6 @@ def buildRecipeArray(userId, ingredientInput):
     vetoedTechniques = getTechniques(userId, True)
     familiarTechniques = getTechniques(userId, False)
 
-    #userHasVeto = (len(vetoedIngredients) >= 0) or (len(vetoedTechniques) >= 0)
-
-    #for recipe in recipeDb.find({'ingredients': {'$in': ingredientInput}}):
     for recipe in recipeDb.aggregate([ 
         {'$match': {
             '$and': [
@@ -121,7 +82,7 @@ def buildRecipeArray(userId, ingredientInput):
         }}
     ]):
 
-        if (recipeCount > 500):
+        if (recipeCount > 200):
             break
 
         # Initialize variables
@@ -131,15 +92,8 @@ def buildRecipeArray(userId, ingredientInput):
         extraCount = 0
         techniqueCount = 0
 
-        # 4/12 UPDATE: Liz commented out this section because the mongo query excludes vetoed
-        #     ingredients and techniques.
-        # If there is at least one veto preference, check if we should veto this recipe
-        #if (userHasVeto == True):
-        #    if (isRecipeVetoed(userId, recipe, vetoedIngredients, vetoedTechniques) == True):
-        #        break # recipe is vetoed
-
         if (len(recipeIngredients) <= 0):
-            break # recipe has no ingredients. should not happen, but checking just in case
+            continue # recipe has no ingredients. should not happen, but checking just in case
 
         for ingredient in recipeIngredients:
             if (ingredient in ingredientInput):
@@ -158,7 +112,7 @@ def buildRecipeArray(userId, ingredientInput):
         recipeObject['name'] = recipe['recipeName']
         recipeObject['ingredients'] = recipeIngredients
         recipeObject['techniques'] = recipeTechniques
-        recipeObject['rating'] = 0 #TODO calculate this
+        recipeObject['averageRating'] = recipe['averageRating']
         recipeObject['cookTime'] = recipe['minutes']
         recipeObject['ingredientCount'] = ingredientCount
         recipeObject['extraCount'] = extraCount
@@ -168,6 +122,21 @@ def buildRecipeArray(userId, ingredientInput):
         recipeCount += 1
 
     return recipeArray
+
+class SearchAPI(Resource):
+    def post(self):
+        parser.add_argument('userId', type=str)
+        parser.add_argument('ingredientInput', type=str, action="append")
+        args = parser.parse_args()
+
+        try:
+            recipeArray = buildRecipeArray(args['userId'], args['ingredientInput'])
+            recipeResults = { 'recipeArray': recipeArray }
+        except:
+            print("Count not retrieve recipe array")
+            return {'recipeArray': []}
+
+        return recipeResults
 
 
 
@@ -197,19 +166,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-class SearchAPI(Resource):
-    def post(self):
-        parser.add_argument('userId', type=str)
-        parser.add_argument('ingredientInput', type=str, action="append")
-        args = parser.parse_args()
-
-        try:
-            recipeArray = buildRecipeArray(args['userId'], args['ingredientInput'])
-            recipeResults = { 'recipeArray': recipeArray }
-        except:
-            print("Count not retrieve recipe array")
-            return {'recipeArray': []}
-
-        return recipeResults

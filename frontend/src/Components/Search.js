@@ -212,7 +212,7 @@ class Search extends Component {
                     <TableCell align="center">{row.ingredients.join(', ')}</TableCell>
                     <TableCell align="center">{row.techniques.join(', ')}</TableCell>
                     <TableCell align="center">{row.cookTime}</TableCell>
-                    <TableCell align="center">{row.rating}</TableCell>
+                    <TableCell align="center">{row.averageRating}</TableCell>
                     <TableCell align="center">{row.ingredientCount}</TableCell>
                     <TableCell align="center">{row.extraCount}</TableCell>
                     <TableCell align="center">{row.techniqueCount}</TableCell>
