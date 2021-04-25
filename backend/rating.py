@@ -1,8 +1,11 @@
 from flask_restful import Api, Resource, reqparse
+from .mongoconnection import mongo_setup
 from .pgconnection import pg_conn
 import psycopg2
+import pymongo
 
 parser = reqparse.RequestParser()
+recipeDb = mongo_setup()
 
 def upsertRating(inputTuple):
 
@@ -70,14 +73,16 @@ def deleteRating(inputTuple):
 def calculateAverageRating(recipeId):
 
     averageRating = 0
-    sql = """SELECT AVG(rating) AS 'averageRating' FROM ratings WHERE ratings.recipeId = %s"""
+    sql = """SELECT AVG(rating) FROM ratings WHERE recipeId = {0}""".format(recipeId)
 
     try:
         conn = pg_conn()
         cur = conn.cursor()
-        cur.execute(sql, recipeId)
+        cur.execute(sql)
         avg = cur.fetchone()
-        averageRating = avg['averageRating']
+        averageRating = int(avg[0])
+
+        recipeDb.update_one({'recipeId': recipeId}, {'$set': { 'averageRating': averageRating }} )
 
     except (Exception, psycopg2.Error) as error:
         print("Error while fetching data from PostgreSQL", error)
@@ -88,7 +93,6 @@ def calculateAverageRating(recipeId):
             conn.close()
 
     return averageRating
-    
 
 class RatingAPI(Resource):
 
@@ -109,8 +113,7 @@ class RatingAPI(Resource):
         final_args = (userId, args['recipeId'], rating, fav)
         print(final_args)
 
-        #averageRating = calculateAverageRating(args['recipeId'])
-        #TODO: add this average rating to mongo db
+        averageRating = calculateAverageRating(args['recipeId'])
         
         return upsertRating(final_args)
 

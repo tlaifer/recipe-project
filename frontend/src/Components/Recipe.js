@@ -15,7 +15,6 @@ class Recipe extends React.Component {
     recipeId: '',
     rating: '',
     favorite: '',
-    setRating: '',
     recipeData: '',
     recipeFetched: false
   }
