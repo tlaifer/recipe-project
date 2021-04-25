@@ -5,9 +5,10 @@ from flask_cors import CORS #comment this on deployment
 import backend.pgconnection as pgconnection
 import backend.mongoconnection as mongoconnection
 import backend.ingredients as ingredients
-import backend.techniques as techniques
 import backend.recipeSearch as recipeSearch
 import backend.recipeSort as recipeSort
+import backend.singleRecipe as singleRecipe
+import backend.techniques as techniques
 import backend.user as user
 import backend.rating as rating
 import backend.vetoIngredients as vetoIngredients
@@ -47,10 +48,6 @@ class OneRecipeTest(Resource):
 
         return recipeResults
 
-class RecipeAPI(Resource):
-    def get(self, id):
-        return { f'message': f'retrieve recipe with id {id}' }
-
 # Test APIs
 api.add_resource(Hello, '/')
 api.add_resource(OneRecipeTest, '/api/oneRecipe/', endpoint='oneRecipe')
@@ -62,7 +59,7 @@ api.add_resource(recipeSort.RecipeSortAPI, '/api/recipeSort/', endpoint='recipeS
 # Static Info
 api.add_resource(ingredients.IngredientsAPI, '/api/ingredients/', endpoint='ingredients')
 api.add_resource(techniques.TechniquesAPI, '/api/techniques/', endpoint='techniques')
-api.add_resource(RecipeAPI, '/api/recipe/<int:id>', endpoint='recipe')
+api.add_resource(singleRecipe.RecipeAPI, '/api/recipe/<int:id>', endpoint='recipe')
 
 # User Information
 api.add_resource(user.UserAPI, '/api/user/', '/api/user/<int:id>', endpoint='user')
