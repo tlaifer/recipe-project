@@ -30,7 +30,20 @@ class Recipe extends React.Component {
 
   handleSendToFavorite = () => { 
     this.setState({favorite: 't'})
-    this.handleSubmit()
+    axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/rating/', {
+      userId: this.props.userId,
+      recipeId: this.state.recipeId,
+      favorite: 't',
+      rating: this.state.rating,
+    }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      console.log("SUCCESS", response);
+    }).catch(error => {
+      console.log(error)
+    });
   }
 
   loadRecipe = () => {
