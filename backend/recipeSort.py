@@ -7,9 +7,9 @@ def sortRecipes(recipeArray, sortVariable):
 
     sortedArray = []
 
-    if (sortVariable in ['ingredientCount', 'techniqueCount']):
+    if (sortVariable in ['ingredientCount', 'techniqueCount', 'averageRating']):
         sortDescending = True
-    elif (sortVariable == 'extraCount'):
+    elif (sortVariable == 'extraCount', 'cookTime'):
         sortDescending = False
     else:
         return [] # Incorrect sort variable

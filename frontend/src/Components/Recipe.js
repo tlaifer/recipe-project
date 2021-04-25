@@ -16,6 +16,8 @@ class Recipe extends React.Component {
     rating: '',
     favorite: '',
     setRating: '',
+    recipeData: '',
+    recipeFetched: false
   }
 
   componentDidMount () {
@@ -32,8 +34,25 @@ class Recipe extends React.Component {
     this.handleSubmit()
   }
 
-  handleSubmit = () => {
+  loadRecipe = () => {
+    if (this.state.recipeFetched === false) {
+      this.recipeApiCall(this.props.match.params.recipeId)
+      this.setState({ recipeFetched: true });
+    }
+  }
 
+  recipeApiCall = (recipeId) => {
+    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/recipe/' + recipeId)
+    .then((response) => {
+      console.log("SUCCESS", response);
+      this.setState({ recipeData: response.data });
+    }).catch(error => {
+      console.log(error)
+    });
+    return;
+  }
+
+  handleSubmit = () => {
     axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/rating/', {
       userId: this.props.userId,
       recipeId: this.state.recipeId,
@@ -48,25 +67,26 @@ class Recipe extends React.Component {
     }).catch(error => {
       console.log(error)
     });
-
   };
 
   render() {
+    this.loadRecipe()
     return (
       <div>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <h1> Recipe Title: recipe {this.state.recipeId}</h1>
+          <h1>{this.state.recipeData.name}</h1>
         </Grid>
-        <Grid item xs={12}>Recipe description</Grid>
-        <Grid item xs={6}>Recipe Steps:</Grid>
-        <Grid item xs={6}>
-          <Grid item xs={6}>
+        <Grid item xs={12}>{this.state.recipeData.description}</Grid>
+        <Grid item xs={4}>Ingredients:</Grid>
+        <Grid item xs={4}>Steps:</Grid>
+        <Grid item xs={4}>
+          <Grid item xs={4}>
             <Button onClick = {this.handleSendToFavorite}> Save to Favorites
               <FavoriteIcon/>
             </Button>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <FormControl component="fieldset" >
               <FormLabel component="legend">Rate this recipe!</FormLabel>
               <RadioGroup aria-label="rating" name="rating" value={this.rating} onChange={this.handleRadioChange}>
@@ -81,7 +101,7 @@ class Recipe extends React.Component {
               </Button>
             </FormControl>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             Other User Ratings
           </Grid>
         </Grid>

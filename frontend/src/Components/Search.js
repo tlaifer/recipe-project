@@ -68,7 +68,6 @@ class Search extends Component {
   }
 
   handleRecipeLookup = (recipeId) => {
-    this.recipeApiCall(recipeId);
     this.setState({ currentRecipe: 'results' });
   }
 
@@ -116,17 +115,6 @@ class Search extends Component {
     }).then((response) => {
       console.log("SUCCESS", response);
       this.setState({ searchResults: response.data.sortedArray });
-    }).catch(error => {
-      console.log(error)
-    });
-    return;
-  }
-
-  recipeApiCall = (recipeId) => {
-    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/recipe/' + recipeId)
-    .then((response) => {
-      console.log("SUCCESS", response);
-      this.setState({ currentRecipe: response.data });
     }).catch(error => {
       console.log(error)
     });
