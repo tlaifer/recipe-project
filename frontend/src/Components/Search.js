@@ -175,6 +175,12 @@ class Search extends Component {
             <Button variant="contained" color="primary" onClick={this.sortApiCall('extraCount')}>Sort by Fewest Extra Ingredients</Button>
             <Button variant="contained" color="primary" onClick={this.sortApiCall('techniqueCount')}>Sort by Preferred Techniques</Button>
           </div>
+          <div></div>
+          <div>
+          <Button variant="contained" color="primary" onClick={this.sortApiCall('cookTime')}>Sort by Cook Time</Button>
+          <Button variant="contained" color="primary" onClick={this.sortApiCall('averageRating')}>Sort by Average Rating</Button>
+          </div>
+          <div></div>
           <Button variant="contained" color="primary" onClick={this.handleBack}>New Search</Button>
           <TableContainer component={Paper}>
             <Table className="table" aria-label="simple table">
