@@ -5,12 +5,12 @@ from flask_cors import CORS #comment this on deployment
 import backend.pgconnection as pgconnection
 import backend.mongoconnection as mongoconnection
 import backend.ingredients as ingredients
+import backend.rating as rating
 import backend.recipeSearch as recipeSearch
 import backend.recipeSort as recipeSort
 import backend.singleRecipe as singleRecipe
 import backend.techniques as techniques
 import backend.user as user
-import backend.rating as rating
 import backend.vetoIngredients as vetoIngredients
 
 app = Flask(__name__)
