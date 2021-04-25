@@ -11,14 +11,17 @@ def insertVetoIngredients(inputTuple):
 
     insert_sql = '''
     INSERT INTO vetoedIngredients (userId,vetoIngredient)
-        VALUES %s
+        VALUES (%(userId)s, %(vetoIngredient)s)
     '''
     success = False
+
+    print(insert_sql)
+    print(inputTuple)
 
     try:
         conn = pg_conn()
         cur = conn.cursor()
-        cur.execute(insert_sql, inputTuple)
+        cur.executemany(insert_sql, inputTuple)
         conn.commit()
         success = True
     except (Exception, psycopg2.DatabaseError) as error:
@@ -69,16 +72,22 @@ class VetoIngredientsAPI(Resource):
 
     def post(self):
         parser.add_argument('userId', type=int)
-        parser.add_argument('vetoIngredients', type=list)
+        parser.add_argument('vetoIngredients', type=dict, action='append')
         args = parser.parse_args()
         userId = args["userId"]
+        print("userId: ")
         print(userId)
-        print(args["vetoIngredients"])
-        tuples = itertools.zip_longest(list(userId),args["vetoIngredients"], fillvalue= userId)
+        tuples = []
+        for i in args["vetoIngredients"]:
+            tuples.append({"userId": userId, "vetoIngredient": i["id"]})
+        print("Tuples: ")
+        print(tuples)
+
 
         # Delete all existing entries and then reinsert
         # Could optimize with union set
         deleteUserVetoIngredients((userId,))
+        print("Delete successful")
         return insertVetoIngredients(tuples)
 
     def delete(self):

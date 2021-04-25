@@ -8,9 +8,9 @@ def getIngredients(common=True):
 
     ingredients = []
     if common == False:
-        queryString = """SELECT DISTINCT ingredientName FROM ingredients ORDER BY ingredientName"""
+        queryString = """SELECT DISTINCT ingredientId, ingredientName FROM ingredients ORDER BY ingredientName"""
     else:
-        queryString = """SELECT DISTINCT ingredientName FROM ingredients WHERE common = 't' ORDER BY ingredientName"""
+        queryString = """SELECT DISTINCT ingredientId, ingredientName FROM ingredients WHERE common = 't' ORDER BY ingredientName"""
 
     try:
         pgCur.execute(queryString)
@@ -21,7 +21,7 @@ def getIngredients(common=True):
     rows = pgCur.fetchall()
     if (len(rows) > 0):
         for row in rows:
-            ingredients.append({ 'name': row[0], 'value': False })
+            ingredients.append({ 'id': row[0], 'name': row[1], 'value': False })
 
     return ingredients
 

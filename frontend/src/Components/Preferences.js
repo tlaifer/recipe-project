@@ -186,11 +186,11 @@ class Preferences extends Component {
     //value will contain the list of currently selected options
     let selectedIngredients = value;
 
-    this.state.ingredients.forEach(ingredient => {
-      if (selectedIngredients.indexOf(this.state.ingredients.name) > -1) {
-        this.state.ingredients.value = true;
+    this.state.ingredients.forEach((ingredient, idx) => {
+      if (selectedIngredients.indexOf(ingredient.name) > -1) {
+        this.state.ingredients[idx].value = true;
       } else {
-        this.state.ingredients.value = false
+        this.state.ingredients[idx].value = false
       }
     });
     this.setState({ ingredients: this.state.ingredients });
@@ -199,7 +199,7 @@ class Preferences extends Component {
   handleIngredientSave = () => {
     axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/vetoIngredients/', {
       userId: this.state.userId,
-      vetoIngredients: this.state.ingredients,
+      vetoIngredients: this.state.ingredients.filter(x => x.value == true),
     }, {
       headers: {
           'Content-Type': 'application/json'
@@ -232,7 +232,6 @@ class Preferences extends Component {
 
   handleSubmitPreferences = () => {
     // First upsert vetoed ingredients
-    console.log(this.state.ingredients)
     this.handleIngredientSave()
 
     // Second upsert user technique selections
@@ -295,7 +294,7 @@ class Preferences extends Component {
             options={Array.from(this.state.ingredients).map(ingredient => ingredient.name)}
             //defaultValue={[state.ingredients[0].name]}
             getOptionLabel={(option) => option}
-            onChange={this.handleIngredientChange}
+            onChange={(event,value, reason) => this.handleIngredientChange(event,value, reason)}
             renderInput={(params) => (
               <TextField
                 {...params}
