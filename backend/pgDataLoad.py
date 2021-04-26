@@ -23,7 +23,7 @@ def create_tables(conn):
         CREATE TABLE IF NOT EXISTS vetoedIngredients (
             userId INT,
             vetoIngredient INT,
-            CONSTRAINT pk_rating PRIMARY KEY (userId,vetoIngredient)
+            PRIMARY KEY (userId,vetoIngredient)
             )
         """,
         """
@@ -72,6 +72,27 @@ def create_tables(conn):
     finally:
         if conn is not None:
             conn.close()
+
+def create_indices(conn):
+    command = (
+        """
+        CREATE INDEX idx_recipeId ON ratings(recipeId);
+        """)
+
+    try:
+        # # connect to the PostgreSQL server
+        cur = conn.cursor()
+        # create index one by one
+        cur.execute(command)
+        # close communication with the PostgreSQL database server
+        cur.close()
+        # commit the changes
+        conn.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close() 
 
 def printAllTables(cursor):
     cursor.execute("""SELECT table_name FROM information_schema.tables
@@ -148,12 +169,17 @@ def doDataLoad():
 
     print("loading ratings...")
     copy_from_file(pgconnection.pg_conn(), loadRatingsDf(), "ratings")
-    print("loading techniques...")
-    copy_from_file(pgconnection.pg_conn(), loadTechniquesDf(), "techniques")
-    print("loading ingredients...")
-    copy_from_file(pgconnection.pg_conn(), loadIngredientsDf(), "ingredients")
+    # print("loading techniques...")
+    # copy_from_file(pgconnection.pg_conn(), loadTechniquesDf(), "techniques")
+    # print("loading ingredients...")
+    # copy_from_file(pgconnection.pg_conn(), loadIngredientsDf(), "ingredients")
 
-    print("inserted data to tables")
+    print("inserted data to tables, now indexing...")
+
+    create_indices(pgconnection.pg_conn())
+
+    print("finished indexing")
+
 
 if __name__ == "__main__":
     doDataLoad()
