@@ -65,3 +65,12 @@
 .right {
   float:right
 }
+
+.technique {
+  width: 200px;
+}
+
+.technique-header {
+  width: 200px;
+  text-align: left;
+}

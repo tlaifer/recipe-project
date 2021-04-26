@@ -1,6 +1,8 @@
 import React, {Component} from "react";
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormGroup from '@material-ui/core/FormGroup';
@@ -19,16 +21,12 @@ const colSize = 20;
 /**
  * TODO: replace with DB call to UserTechniques
  */
-let techniquesInit = [
-  {
-    name: 'tec1',
-    value: false
-  },
-  {
-    name: 'tec2',
-    value: false
-  }
-];
+
+let intMap = {
+  "1": false,
+  "2": true,
+  "3": null
+}
 
 /**
  * TODO: replace with DB call to Ingredients & UserIngredients
@@ -53,8 +51,7 @@ class Preferences extends Component {
       techniques: [],
       ingredients: [],
       allUsers: null,
-      newUserInputName: '',
-      optionsFetched: false
+      newUserInputName: ''
     };
   };
 
@@ -82,6 +79,7 @@ class Preferences extends Component {
 
   componentDidMount() {
     this.fetchUsers();
+    this.handleIngredientLoad();
   };
 
   ingredientApiCall = () => { /** TODO: this should probably be props rather than state */
@@ -96,23 +94,19 @@ class Preferences extends Component {
   }
 
   techniquesApiCall = () => { /** TODO: this should probably be props rather than state */
-    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/techniques/')
+    axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/techniques/', {
+      user: this.state.userId,
+    }, {
+      headers: {
+          'Content-Type': 'application/json'
+      }
+    })
     .then((response) => {
       console.log("SUCCESS", response);
       var techniques = response.data.techniqueArray;
       
-      // chunks techniques into columns
-      var chunkedTechniques = techniques.reduce((resultArr, item, i) => {
-        var chunkIndex = Math.floor(i/colSize);
-        if (! resultArr[chunkIndex]) {
-            resultArr[chunkIndex] = [];
-        }
-        resultArr[chunkIndex].push(item);
-        return resultArr;
-      }, []);
 
       this.setState({ techniques:  techniques});
-      this.setState({ chunkedTechniques:  chunkedTechniques});
     }).catch(error => {
       console.log(error)
     });
@@ -120,17 +114,11 @@ class Preferences extends Component {
   }
 
   handleIngredientLoad = () => {
-    if (this.state.optionsFetched === false) {
-      this.ingredientApiCall()
-      this.setState({ optionsFetched: true });
-    }
+    this.ingredientApiCall()
   }
 
   handleTechniqueLoad = () => {
-    if (this.state.optionsFetched === false) {
-      this.techniquesApiCall()
-      this.setState({ optionsFetched: true });
-    }
+    this.techniquesApiCall()
   }
 
   handleDeleteUser = () => {
@@ -164,21 +152,21 @@ class Preferences extends Component {
   handleUserChage = (event) => {
     this.setState({
       userId: event.target.value
-    });
-    /**
-     * TODO: fetch user prefs
-     */
-    this.render();
+    }, () => {
+      this.handleIngredientLoad();
+      this.handleTechniqueLoad();
+    });    
   }
 
   handleTechniqueChange = (event) => {
+    let updatedTechniques = this.state.techniques;
     let index = this.state.techniques.findIndex(element => {
       return element.name === event.target.name;
     });
-    this.state.techniques[index].value = event.target.checked
+    updatedTechniques[index].value = intMap[event.target.value]
 
     this.setState({
-      techniques: this.state.techniques
+      techniques: updatedTechniques
     });
   };
 
@@ -210,39 +198,34 @@ class Preferences extends Component {
       console.log(error)
     });
   }
-
-  /*
-  TODO: uncomment when endpoint is defined
   
   handleTechniqueSave = () => {
-    axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/technique/', {
-      userId: this.state.userId,
-      techniques: this.state.techniques,
+    axios.put('http://sp21-cs411-13.cs.illinois.edu:5000/api/techniques/', {
+      user: this.state.userId,
+      techniques: this.state.techniques
     }, {
       headers: {
           'Content-Type': 'application/json'
       }
     }).then(response => {
       console.log("SUCCESS", response);
+      this.techniquesApiCall();
     }).catch(error => {
       console.log(error)
     });
   }
-  */
 
   handleSubmitPreferences = () => {
     // First upsert vetoed ingredients
     this.handleIngredientSave()
 
     // Second upsert user technique selections
-    //this.handleTechniqueSave()
+    this.handleTechniqueSave()
 
     return;
   };
 
   render() {
-    this.handleIngredientLoad()
-    this.handleTechniqueLoad()
     console.log('render called');
     return (
       <div className="body">
@@ -269,18 +252,44 @@ class Preferences extends Component {
         <Grid container spacing={3}>
           <FormControl component="fieldset">
             <FormLabel component="legend">What can you do in the kitchen?</FormLabel>
-
+            <FormGroup>
+              <tr>
+                <th className="technique-header">Cooking Technique</th>
+                <th className="technique-header">Yes</th>
+                <th className="technique-header">No</th>
+                <th className="technique-header">No Preference</th>
+              </tr>
+            </FormGroup>
             <FormGroup>
               {Array.from(this.state.techniques).map(t=>{
                 return (
-                  <FormControlLabel
-                    control={<Checkbox
-                      checked={t.value}
-                      onChange={this.handleTechniqueChange}
-                      name={t.name}
-                    />}
-                    label={t.name}
-                  />
+                  <RadioGroup
+                    row aria-label="position"
+                    name={t.name}
+                    value= { t.value == false ? "1" : t.value == true ? "2" : "3" }
+                    onChange={this.handleTechniqueChange}>
+                    <div className="technique"> {t.name} </div>
+                    <FormControlLabel className="technique"
+                      value="1"
+                      control={<Radio color="primary" />}
+                    />
+                    <FormControlLabel className="technique"
+                      value="2"
+                      control={<Radio color="secondary" />}
+                    />
+                    <FormControlLabel className="technique"
+                      value="3"
+                      control={<Radio color="default" />}
+                    />
+                  </RadioGroup>
+                  // <FormControlLabel
+                  //   control={<Checkbox
+                  //     checked={t.value}
+                  //     onChange={this.handleTechniqueChange}
+                  //     name={t.name}
+                  //   />}
+                  //   label={t.name}
+                  // />
                 )
               })}
             </FormGroup>
