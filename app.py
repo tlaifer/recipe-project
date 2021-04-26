@@ -12,6 +12,7 @@ import backend.singleRecipe as singleRecipe
 import backend.techniques as techniques
 import backend.user as user
 import backend.vetoIngredients as vetoIngredients
+import backend.favorite as favorite
 
 app = Flask(__name__)
 CORS(app) #comment this on deployment
@@ -66,6 +67,7 @@ api.add_resource(user.UserAPI, '/api/user/', '/api/user/<int:id>', endpoint='use
 api.add_resource(rating.RatingAPI, '/api/rating/', endpoint='rating')
 api.add_resource(user.UsersAPI, '/api/users/', endpoint='users')
 api.add_resource(vetoIngredients.VetoIngredientsAPI, '/api/vetoIngredients/', endpoint='vetoIngredients')
+api.add_resource(favorite.FavoriteAPI, "/api/favorite/", endpoint='favorite')
 
 
 if __name__ == '__main__':

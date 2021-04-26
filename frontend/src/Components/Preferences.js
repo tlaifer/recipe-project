@@ -149,7 +149,7 @@ class Preferences extends Component {
     });
   }
 
-  handleUserChage = (event) => {
+  handleUserChange = (event) => {
     this.setState({
       userId: event.target.value
     }, () => {
@@ -235,7 +235,7 @@ class Preferences extends Component {
               <Select
                 labelId="select-user"
                 value={this.userId}
-                onChange={this.handleUserChage}
+                onChange={this.handleUserChange}
               >
                 {this.state.allUsers && this.state.allUsers.map(u => {
                   return (<MenuItem value={u.id}>{u.name}</MenuItem>)
