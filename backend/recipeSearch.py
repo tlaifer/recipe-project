@@ -14,11 +14,13 @@ def getVetoedIngredients(userId):
 
     vetoedIngredients = []
     queryString = """SELECT vetoIngredient FROM vetoedIngredients WHERE userId = {0}""".format(userId)
+    #query2 = """CALL getVetoedIngredients({0})""".format(userId)
 
     try:
         pgCur.execute(queryString)
-    except:
-        print("Can't retrieve vetoed ingredients.")
+        #pgCur.execute(query2)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
         return vetoedIngredients
 
     rows = pgCur.fetchall()
