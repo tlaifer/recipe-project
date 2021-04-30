@@ -13,12 +13,12 @@ parser = reqparse.RequestParser()
 def getVetoedIngredients(userId):
 
     vetoedIngredients = []
-    queryString = """SELECT vetoIngredient FROM vetoedIngredients WHERE userId = {0}""".format(userId)
+    storedFunctionQuery = """SELECT * FROM getVetoedIngredients({0})""".format(userId)
 
     try:
-        pgCur.execute(queryString)
-    except:
-        print("Can't retrieve vetoed ingredients.")
+        pgCur.execute(storedFunctionQuery)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
         return vetoedIngredients
 
     rows = pgCur.fetchall()
@@ -38,12 +38,12 @@ def getVetoedIngredients(userId):
 def getTechniques(userId,vetoed):
 
     techniques = []
-    queryString = """SELECT technique FROM userTechniques WHERE userId = {0} AND isVeto = {1}""".format(userId, str(vetoed).upper())
+    storedFunctionQuery = """SELECT * FROM getTechniques({0}, {1})""".format(userId,str(vetoed).upper())
 
     try:
-        pgCur.execute(queryString)
-    except:
-        print("Can't retrieve techniques.")
+        pgCur.execute(storedFunctionQuery)
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
         return techniques
 
     rows = pgCur.fetchall()

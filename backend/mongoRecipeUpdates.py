@@ -30,7 +30,12 @@ def addRatingsTest():
 
         return
 
+def checkRecipeIndices():
+    print(recipeDb.index_information())
+
 if __name__ == "__main__":
+    checkRecipeIndices()
+
     #indexIngredients()
-    addRatingsTest()
+    #addRatingsTest()
     #addRatings()
