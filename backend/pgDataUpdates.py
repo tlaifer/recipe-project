@@ -55,6 +55,51 @@ def createTechniqueStoredFunction():
 
     return
 
+def execute(sql):
+    conn = pgconnection.pg_conn()
+    try:
+        cur = conn.cursor() # Connect to the PostgreSQL server
+        cur.execute(sql) # Execute SQL 
+        cur.close() # Close communication with the PostgreSQL database server
+        conn.commit() # Commit the changes
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return
+
+def common_ingredients():
+    sql = """
+    CREATE VIEW common_ingredients AS SELECT DISTINCT ingredientId, ingredientName FROM ingredients WHERE common = 't';
+    """
+    execute(sql)
+
+def user_trigger():
+    sql1 = """
+    CREATE OR REPLACE FUNCTION deleteuserinfo() RETURNS trigger AS $dt$
+    BEGIN
+        DELETE FROM usertechniques where userid = OLD.id;
+        DELETE FROM vetoedingredients where userid = OLD.id;
+        RETURN OLD;
+    END;
+    $dt$ LANGUAGE plpgsql;
+    """
+    
+    sql2 = """
+    CREATE TRIGGER UserDeletion
+        BEFORE DELETE ON users
+    FOR EACH ROW
+        EXECUTE PROCEDURE deleteuserinfo();
+    """
+    execute(sql1)
+    execute(sql2)
+    
 if __name__ == "__main__":
     #createIngredientStoredFunction()
     #createTechniqueStoredFunction()
+    #common_ingredients()
+    #user_trigger()

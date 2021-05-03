@@ -41,7 +41,7 @@ def create_tables(conn):
         """, 
         """ 
         CREATE TABLE IF NOT EXISTS usertechniques (
-                userid INT REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE,
+                userid INT REFERENCES users(id) ON UPDATE CASCADE,
                 technique INT REFERENCES techniques(techniqueid) ON UPDATE CASCADE,
                 isVeto BOOL,
                 CONSTRAINT userTechniques_pkey PRIMARY KEY (userid, technique)

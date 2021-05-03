@@ -84,14 +84,24 @@ class Recipe extends React.Component {
   render() {
     this.loadRecipe()
     return (
-      <div>
+      <div className="body">
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <h1>{this.state.recipeData.name}</h1>
+          <h1>{this.state.recipeData.recipeName}</h1>
         </Grid>
         <Grid item xs={12}>{this.state.recipeData.description}</Grid>
-        <Grid item xs={4}>Ingredients:</Grid>
-        <Grid item xs={4}>Steps:</Grid>
+        <Grid item xs={2}>Ingredients:
+          {this.state.recipeData.ingredients && this.state.recipeData.ingredients.map((i) => (
+            <li className="recipeList">{i}</li>
+          ))}
+        </Grid>
+        <Grid item xs={6}>Steps:
+          <ol>
+          {this.state.recipeData.steps && this.state.recipeData.steps.map((s) => (
+            <li className="recipeList">{s}</li>
+          ))}
+          </ol>
+        </Grid>
         <Grid item xs={4}>
           <Grid item xs={4}>
             <Button onClick = {this.handleSendToFavorite}> Save to Favorites

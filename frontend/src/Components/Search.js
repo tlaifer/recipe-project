@@ -221,7 +221,7 @@ class Search extends Component {
                     <TableCell align="center">{row.extraCount}</TableCell>
                     <TableCell align="center">{row.techniqueCount}</TableCell>
                     <TableCell align="right">
-                      <Button onClick={this.saveFavorite(row.id)}>
+                      <Button onClick={() => {this.saveFavorite(row.id)}}>
                         <FavoriteIcon/>
                       </Button>
                     </TableCell>

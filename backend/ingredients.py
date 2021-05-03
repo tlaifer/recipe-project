@@ -10,7 +10,7 @@ def getIngredients(common=True):
     if common == False:
         queryString = """SELECT DISTINCT ingredientId, ingredientName FROM ingredients ORDER BY ingredientName"""
     else:
-        queryString = """SELECT DISTINCT ingredientId, ingredientName FROM ingredients WHERE common = 't' ORDER BY ingredientName"""
+        queryString = """SELECT ingredientId, ingredientName FROM common_ingredients ORDER BY ingredientName"""
 
     try:
         pgCur.execute(queryString)
