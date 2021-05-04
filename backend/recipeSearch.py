@@ -82,7 +82,7 @@ def buildRecipeArray(userId, ingredientInput):
         }}
     ]):
 
-        if (recipeCount > 200):
+        if (recipeCount > 100):
             break
 
         # Initialize variables
