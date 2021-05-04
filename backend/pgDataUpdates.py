@@ -72,6 +72,61 @@ def execute(sql):
 
     return
 
+def deleteVetoIngredientProcedure():
+    conn = pgconnection.pg_conn()
+
+    procedure = """
+    CREATE OR REPLACE PROCEDURE deleteVetoIngredient(uid INT)
+    LANGUAGE PLPGSQL
+    AS $$
+    BEGIN
+      DELETE FROM vetoedIngredients WHERE userId = uid;
+    END;$$
+    """
+
+    try:
+        cur = conn.cursor() # Connect to the PostgreSQL server
+        cur.execute(procedure) # Add stored procedure
+        cur.close() # Close communication with the PostgreSQL database server
+        conn.commit() # Commit the changes
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return
+
+def deleteRatingProcedure():
+    conn = pgconnection.pg_conn()
+
+    procedure = """
+    CREATE OR REPLACE PROCEDURE deleteRating(uid INT, rid INT)
+    LANGUAGE PLPGSQL
+    AS $$
+    BEGIN
+      DELETE FROM ratings WHERE ratings.userId = uid AND ratings.recipeId = rid;
+      COMMIT;
+    END;$$
+    """
+
+    try:
+        cur = conn.cursor() # Connect to the PostgreSQL server
+        cur.execute(procedure) # Add stored procedure
+        cur.close() # Close communication with the PostgreSQL database server
+        conn.commit() # Commit the changes
+
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return
+
 def common_ingredients():
     sql = """
     CREATE VIEW common_ingredients AS SELECT DISTINCT ingredientId, ingredientName FROM ingredients WHERE common = 't';
@@ -103,3 +158,5 @@ if __name__ == "__main__":
     #createTechniqueStoredFunction()
     #common_ingredients()
     #user_trigger()
+    #deleteRatingProcedure()
+    #deleteVetoIngredientProcedure()

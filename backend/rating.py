@@ -54,12 +54,14 @@ def getRating(inputTuple):
     return userRow
 
 def deleteRating(inputTuple):
-    sql = """DELETE FROM ratings WHERE ratings.userId = %s AND ratings.recipeId = %s"""
+    #sql = """DELETE FROM ratings WHERE ratings.userId = %s AND ratings.recipeId = %s"""
+    sql_proc = """CALL deleteRating({0}, {1})""".format(inputTuple)
     success = False
+
     try:
         conn = pg_conn()
         cur = conn.cursor()
-        cur.execute(sql, inputTuple)
+        cur.execute(sql_proc, inputTuple)
         conn.commit()
         success = True
     except (Exception, psycopg2.Error) as error:

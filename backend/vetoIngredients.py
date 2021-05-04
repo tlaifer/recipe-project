@@ -32,13 +32,14 @@ def insertVetoIngredients(inputTuple):
             conn.close()
     return success
 
-def deleteUserVetoIngredients(inputTuple):
-    sql = """DELETE FROM vetoedIngredients WHERE userId = %s"""
+def deleteUserVetoIngredients(userId):
+    #sql = """DELETE FROM vetoedIngredients WHERE userId = %s"""
+    sql_proc = """CALL deleteVetoIngredient({0})""".format(userId)
     success = False
     try:
         conn = pg_conn()
         cur = conn.cursor()
-        cur.execute(sql, inputTuple)
+        cur.execute(sql_proc)
         conn.commit()
         success = True
     except (Exception, psycopg2.Error) as error:
@@ -75,18 +76,17 @@ class VetoIngredientsAPI(Resource):
         parser.add_argument('vetoIngredients', type=dict, action='append')
         args = parser.parse_args()
         userId = args["userId"]
-        print("userId: ")
-        print(userId)
+        print("userId: " + str(userId))
         tuples = []
-        for i in args["vetoIngredients"]:
-            tuples.append({"userId": userId, "vetoIngredient": i["id"]})
-        print("Tuples: ")
-        print(tuples)
+        if (args["vetoIngredients"] != None):
+            for i in args["vetoIngredients"]:
+                tuples.append({"userId": userId, "vetoIngredient": i["id"]})
+        print("Tuples: " + str(tuples))
 
 
         # Delete all existing entries and then reinsert
         # Could optimize with union set
-        deleteUserVetoIngredients((userId,))
+        deleteUserVetoIngredients(userId)
         print("Delete successful")
         return insertVetoIngredients(tuples)
 
@@ -94,7 +94,7 @@ class VetoIngredientsAPI(Resource):
         parser.add_argument('userId', type=int)
         args = parser.parse_args()
 
-        return deleteUserVetoIngredients((args['userId'],))
+        return deleteUserVetoIngredients(args['userId'])
 
     def get(self):
         parser.add_argument('userId', type=int)
