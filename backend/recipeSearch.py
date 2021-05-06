@@ -136,7 +136,7 @@ class SearchAPI(Resource):
             recipeResults = returnRecipes(args['userId'], args['ingredientInput'])
         except:
             print("Count not retrieve recipe array")
-            return {'recipeArray': [], 'recipesSearched': 0}
+            return {'recipeArray': []}
 
         return recipeResults
 
