@@ -18,29 +18,12 @@ import axios from 'axios';
 
 const submitButtonText = 'Save Changes'
 const colSize = 20;
-/**
- * TODO: replace with DB call to UserTechniques
- */
 
 let intMap = {
   "1": false,
   "2": true,
   "3": null
 }
-
-/**
- * TODO: replace with DB call to Ingredients & UserIngredients
- */
-let ingredients = [
-  {
-    name: 'tomatoes',
-    value: false
-  },
-  {
-    name: 'bread',
-    value: false
-  }
-]
 
 class Preferences extends Component {
 
@@ -50,6 +33,7 @@ class Preferences extends Component {
       userId: null,
       techniques: [],
       ingredients: [],
+      vetoedIngredients: [],
       allUsers: null,
       newUserInputName: ''
     };
@@ -82,7 +66,7 @@ class Preferences extends Component {
     this.handleIngredientLoad();
   };
 
-  ingredientApiCall = () => { /** TODO: this should probably be props rather than state */
+  ingredientApiCall = () => {
     axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/ingredients/')
     .then((response) => {
       console.log("SUCCESS", response);
@@ -93,7 +77,19 @@ class Preferences extends Component {
     return;
   }
 
-  techniquesApiCall = () => { /** TODO: this should probably be props rather than state */
+  vetoedIngredientApiCall = () => {
+    axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/vetoIngredients/?userId=' + this.state.userId)
+    .then((response) => {
+      console.log("SUCCESS", response);
+      var vetoedIngredients = response.data.vetoedIngredients;
+      this.setState({ vetoedIngredients:  vetoedIngredients});
+    }).catch(error => {
+      console.log(error)
+    });
+    return;
+  }
+
+  techniquesApiCall = () => {
     axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/techniques/', {
       user: this.state.userId,
     }, {
@@ -104,8 +100,6 @@ class Preferences extends Component {
     .then((response) => {
       console.log("SUCCESS", response);
       var techniques = response.data.techniqueArray;
-      
-
       this.setState({ techniques:  techniques});
     }).catch(error => {
       console.log(error)
@@ -119,6 +113,10 @@ class Preferences extends Component {
 
   handleTechniqueLoad = () => {
     this.techniquesApiCall()
+  }
+
+  handleVetoedIngredientLoad = () => {
+    this.vetoedIngredientApiCall()
   }
 
   handleDeleteUser = () => {
@@ -155,6 +153,7 @@ class Preferences extends Component {
     }, () => {
       this.handleIngredientLoad();
       this.handleTechniqueLoad();
+      this.handleVetoedIngredientLoad();
     });    
   }
 
@@ -301,9 +300,9 @@ class Preferences extends Component {
             id="tags-standard"
             style={{ alignContent: "left" }}
             options={Array.from(this.state.ingredients).map(ingredient => ingredient.name)}
-            //defaultValue={[state.ingredients[0].name]}
+            defaultValue={Array.from(this.state.vetoedIngredients).map(vetoedIngredient => vetoedIngredient.name)}
             getOptionLabel={(option) => option}
-            onChange={(event,value, reason) => this.handleIngredientChange(event,value, reason)}
+            onChange={(event,value, reason) => this.handleIngredientChange(event,value,reason)}
             renderInput={(params) => (
               <TextField
                 {...params}
