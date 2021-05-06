@@ -62,10 +62,11 @@ def getTechniques(userId,vetoed):
         resulting array also include a count of specified ingredients, extra ingredients, and preferred
         techniques per recipe.
 """
-def buildRecipeArray(userId, ingredientInput):
+def returnRecipes(userId, ingredientInput):
 
     recipeDb = mongo_setup()
     recipeArray = []
+    output = {}
     recipeCount = 0
 
     vetoedIngredients = getVetoedIngredients(userId)
@@ -121,7 +122,9 @@ def buildRecipeArray(userId, ingredientInput):
         recipeArray.append(recipeObject)
         recipeCount += 1
 
-    return recipeArray
+    output = { 'recipeArray': recipeArray }
+
+    return output
 
 class SearchAPI(Resource):
     def post(self):
@@ -130,11 +133,10 @@ class SearchAPI(Resource):
         args = parser.parse_args()
 
         try:
-            recipeArray = buildRecipeArray(args['userId'], args['ingredientInput'])
-            recipeResults = { 'recipeArray': recipeArray }
+            recipeResults = returnRecipes(args['userId'], args['ingredientInput'])
         except:
             print("Count not retrieve recipe array")
-            return {'recipeArray': []}
+            return {'recipeArray': [], 'recipesSearched': 0}
 
         return recipeResults
 
@@ -161,7 +163,7 @@ def testOneRecipe(userId, ingredientInput):
     return oneRecipe
 
 def main():
-    recipeArray = buildRecipeArray(1,["basmati rice"])
+    recipeArray = returnRecipes(1,["basmati rice"])
     return
 
 if __name__ == '__main__':

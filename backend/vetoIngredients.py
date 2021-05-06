@@ -50,23 +50,43 @@ def deleteUserVetoIngredients(userId):
             conn.close()
     return success   
     
-def getUserVetoIngredients(inputTuple):
-    sql = """SELECT * FROM vetoedIngredients WHERE userId = %s"""
+def getUserVetoIngredients(uid):
+    sql = """
+          SELECT i.ingredientName
+          FROM vetoedIngredients AS vi
+          LEFT JOIN ingredients AS i ON vi.vetoIngredient = i.ingredientId
+          WHERE userId = {0}
+          """
 
-    userRow = None
+    results = {}
+    userRow = []
+    vetoedIngredientArray = []
+
     try:
         conn = pg_conn()
         cur = conn.cursor()
-        cur.execute(sql, inputTuple)
+        print(sql.format(uid))
+        cur.execute(sql.format(uid))
         userRow = cur.fetchall()
+
+        for vetoedIngredient in userRow:
+            vetoedIngredientObject = {}
+            vetoedIngredientObject = { 'name':  vetoedIngredient[0]}
+
+            vetoedIngredientArray.append(vetoedIngredientObject)
+
     except (Exception, psycopg2.Error) as error:
         print("Error while fetching data from PostgreSQL", error)
     finally:
         if conn:
             cur.close()
             conn.close()
+    
+    results = { 'vetoedIngredients': vetoedIngredientArray }
 
-    return userRow       
+    print(results)
+
+    return results
 
 
 class VetoIngredientsAPI(Resource):
@@ -83,7 +103,6 @@ class VetoIngredientsAPI(Resource):
                 tuples.append({"userId": userId, "vetoIngredient": i["id"]})
         print("Tuples: " + str(tuples))
 
-
         # Delete all existing entries and then reinsert
         # Could optimize with union set
         deleteUserVetoIngredients(userId)
@@ -97,10 +116,10 @@ class VetoIngredientsAPI(Resource):
         return deleteUserVetoIngredients(args['userId'])
 
     def get(self):
-        parser.add_argument('userId', type=int)
+        parser.add_argument('userId', type=int, location='args')
         args = parser.parse_args()
 
-        return getUserVetoIngredients((args['userId'],))
+        return getUserVetoIngredients(args['userId'])
 
 
 
