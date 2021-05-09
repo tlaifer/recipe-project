@@ -2,6 +2,7 @@ from .mongoconnection import mongo_setup
 from .pgconnection import pg_setup
 from flask_restful import Api, Resource, reqparse
 import psycopg2
+from backend.recipeSearch import getTechniques, getVetoedIngredients
 
 pgCur = pg_setup()
 parser = reqparse.RequestParser()
@@ -32,7 +33,7 @@ def findRecommendRecipes(uid):
         AND ((favorite = TRUE) OR (rating >= 4))
     GROUP BY recipeId
     ORDER BY COUNT(*) DESC
-    LIMIT 10
+    LIMIT 100
     """.format(uid)
 
     try:
@@ -47,9 +48,25 @@ def findRecommendRecipes(uid):
         for row in rows:
             recommendedRecipesInit.append(row[0])
 
+    vetoedIngredients = getVetoedIngredients(uid)
+    vetoedTechniques = getTechniques(uid, True)
+
+    totalRecipes = 0
+
     for recipe in recommendedRecipesInit:
 
-        for fullRecipe in recipeDb.find( { 'recipeId': recipe } ): # Should be just one
+        if (totalRecipes >= 10):
+            break
+
+        for fullRecipe in recipeDb.aggregate([ 
+            {'$match': {
+                '$and': [
+                    { 'recipeId' : recipe },
+                    {'ingredients': {'$nin': vetoedIngredients}},
+                    {'techniques': {'$nin': vetoedTechniques}}
+                ]
+            }}
+        ]):
 
             if (fullRecipe == None):
                 continue # Go to next recipe if ID is invalid for some reason
@@ -64,6 +81,7 @@ def findRecommendRecipes(uid):
             recipeObject['cookTime'] = fullRecipe['minutes']
 
             recommendedRecipes.append(recipeObject)
+            totalRecipes += 1
 
     return recommendedRecipes
 

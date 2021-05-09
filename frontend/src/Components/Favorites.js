@@ -141,6 +141,7 @@ class Favorites extends Component {
                 </Table>
               </TableContainer>
           <h1> Top 10 Recommended Recipes </h1>
+          <h3> Users whose preferences align with yours tend to like the following recipes: </h3>
           <TableContainer component={Paper}>
             <Table className="table" aria-label="simple table">
               <TableHead>

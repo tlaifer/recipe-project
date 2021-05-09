@@ -39,10 +39,17 @@ def addRatingsTest():
         return
 
 def checkRecipeIndices():
-    print(recipeDb.index_information())
+    print("\n")
+    print("Index information:" + str(recipeDb.index_information()))
+
+def countRecords():
+    print("\n")
+    print("Total recipes: " + str(recipeDb.count()))
+    print("\n")
 
 if __name__ == "__main__":
     checkRecipeIndices()
+    countRecords()
 
     #indexIngredients()
     #indexRecipeId()
