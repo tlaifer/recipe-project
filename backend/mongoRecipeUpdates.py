@@ -11,6 +11,14 @@ def indexIngredients():
 
     return
 
+def indexRecipeId():
+
+    # Index recipe IDs in ascending order
+    recipeDb.create_index( [ ('recipeId', 1) ] )
+    print("Recipe IDs indexed!")
+
+    return
+
 def addRatings():
 
     #for recipe in recipeDb.find():
@@ -37,5 +45,6 @@ if __name__ == "__main__":
     checkRecipeIndices()
 
     #indexIngredients()
+    #indexRecipeId()
     #addRatingsTest()
     #addRatings()

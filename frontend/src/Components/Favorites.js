@@ -19,16 +19,46 @@ class Favorites extends Component {
       this.state = {
         favorites: '',
         display: this.props.display,
-        favoritesLoaded : false
+        favoritesLoaded : false,
+        recommendationsLoaded: false,
+        recommendedRecipes: '',
+        currentRecipe: ''
       }
     };
+
+    handleRecipeLookup = (recipeId) => {
+      this.setState({ currentRecipe: 'results' });
+    }
+
+    recommendationApiCall = () => {
+      axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/recommendations/', {
+        userId: 1
+      }, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+      }).then((response) => {
+        console.log("SUCCESS", response);
+        this.setState({ recommendedRecipes: response.data.recommendedRecipeArray });
+      }).catch(error => {
+        console.log(error)
+      });
+      return;
+    }
+
+    handleLoadRecommendations = () => {
+      if (this.state.recommendationsLoaded === false) {
+        this.recommendationApiCall()
+        this.setState({ recommendationsLoaded: true });
+      }
+    }
 
     handleLoadFavorites = () => {
         if (this.state.favoritesLoaded === false) {
           this.loadFavorites()
           this.setState({ favoritesLoaded: true });
         }
-      }
+    }
 
     loadFavorites = () => {
         axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/favorite/', {
@@ -72,6 +102,7 @@ class Favorites extends Component {
 
     render() {
         this.handleLoadFavorites()
+        this.handleLoadRecommendations()
         return(
             <div className = 'body'>
             <h1> Favorites for User: insert username</h1>
@@ -109,6 +140,39 @@ class Favorites extends Component {
                   </TableBody>
                 </Table>
               </TableContainer>
+          <h1> Top 10 Recommended Recipes </h1>
+          <TableContainer component={Paper}>
+            <Table className="table" aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Recipe Name</TableCell>
+                  <TableCell align="center">Ingredients</TableCell>
+                  <TableCell align="center">Techniques</TableCell>
+                  <TableCell align="center">Cooking Time</TableCell>
+                  <TableCell align="center">Average Rating</TableCell>
+                  <TableCell align="right">Add to Favorites</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {Array.from(this.state.recommendedRecipes).map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell component="th" scope="row">
+                      <Link onClick={this.handleRecipeLookup} href={"/recipes/" + row.id}>{row.name}</Link>
+                    </TableCell>
+                    <TableCell align="center">{row.ingredients.join(', ')}</TableCell>
+                    <TableCell align="center">{row.techniques.join(', ')}</TableCell>
+                    <TableCell align="center">{row.cookTime}</TableCell>
+                    <TableCell align="center">{row.averageRating}</TableCell>
+                    <TableCell align="right">
+                      <Button onClick={() => {this.saveFavorite(row.id)}}>
+                        <FavoriteIcon/>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
             </div>
           )
     }

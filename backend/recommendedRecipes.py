@@ -1,13 +1,15 @@
-
+from .mongoconnection import mongo_setup
 from .pgconnection import pg_setup
 from flask_restful import Api, Resource, reqparse
 import psycopg2
 
 pgCur = pg_setup()
 parser = reqparse.RequestParser()
+recipeDb = mongo_setup()
 
 def findRecommendRecipes(uid):
 
+    recommendedRecipesInit = []
     recommendedRecipes = []
 
     query = """
@@ -42,7 +44,25 @@ def findRecommendRecipes(uid):
 
     if (len(rows) > 0):
         for row in rows:
-            recommendedRecipes.append(row[0])
+            recommendedRecipesInit.append(row[0])
+
+    for recipe in recommendedRecipesInit:
+
+        for fullRecipe in recipeDb.find( { 'recipeId': recipe } ): # Should be just one
+
+            if (fullRecipe == None):
+                continue # Go to next recipe if ID is invalid for some reason
+
+            recipeObject = {}
+
+            recipeObject['id'] = fullRecipe['recipeId']
+            recipeObject['name'] = fullRecipe['recipeName']
+            recipeObject['ingredients'] = fullRecipe['ingredients']
+            recipeObject['techniques'] = fullRecipe['techniques']
+            recipeObject['averageRating'] = fullRecipe['averageRating']
+            recipeObject['cookTime'] = fullRecipe['minutes']
+
+            recommendedRecipes.append(recipeObject)
 
     return recommendedRecipes
 
