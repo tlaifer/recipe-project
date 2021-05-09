@@ -23,6 +23,7 @@ def findRecommendRecipes(uid):
         FROM ratings
         WHERE recipeId IN (SELECT * FROM usersFavoriteRecipes)
             AND ((favorite = TRUE) OR (rating >= 4))
+            AND userId != {0}
     )
     SELECT recipeId
     FROM ratings
