@@ -6,6 +6,7 @@ import backend.pgconnection as pgconnection
 import backend.mongoconnection as mongoconnection
 import backend.ingredients as ingredients
 import backend.rating as rating
+import backend.recommendedRecipes as recommendedRecipes
 import backend.recipeSearch as recipeSearch
 import backend.recipeSort as recipeSort
 import backend.singleRecipe as singleRecipe
@@ -53,9 +54,10 @@ class OneRecipeTest(Resource):
 api.add_resource(Hello, '/')
 api.add_resource(OneRecipeTest, '/api/oneRecipe/', endpoint='oneRecipe')
 
-# Searching
+# Searching and Recommendations
 api.add_resource(recipeSearch.SearchAPI, '/api/search/', endpoint='search')
 api.add_resource(recipeSort.RecipeSortAPI, '/api/recipeSort/', endpoint='recipeSort')
+api.add_resource(recommendedRecipes.RecommendationAPI, '/api/recommendations/', endpoint='recommendations')
 
 # Static Info
 api.add_resource(ingredients.IngredientsAPI, '/api/ingredients/', endpoint='ingredients')
