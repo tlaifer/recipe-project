@@ -95,7 +95,7 @@ def deleteFavorite(inputTuple):
 
 class FavoriteAPI(Resource):
 
-    def get(self):
+    def post(self):
         parser.add_argument('userId', type=int)
         args = parser.parse_args()
         userId = args['userId'] if args['userId'] is not None else 1

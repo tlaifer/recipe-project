@@ -69,8 +69,8 @@ def buildRecipeArray(userId, ingredientInput):
     recipeCount = 0
 
     vetoedIngredients = getVetoedIngredients(userId)
+    print(vetoedIngredients)
     vetoedTechniques = getTechniques(userId, True)
-    print(vetoedTechniques)
     familiarTechniques = getTechniques(userId, False)
 
     for recipe in recipeDb.aggregate([ 

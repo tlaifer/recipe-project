@@ -6,9 +6,13 @@ def createIngredientStoredFunction():
 
     funct = """
     CREATE OR REPLACE FUNCTION getVetoedIngredients(id INT)
-    RETURNS TABLE(ingredient INT) AS $$
+    RETURNS TABLE(ingredient varchar(255)) AS $$
     BEGIN
-        RETURN QUERY(SELECT vetoIngredient FROM vetoedIngredients WHERE userId = id);
+        RETURN QUERY(
+            SELECT i.ingredientName
+            FROM vetoedIngredients AS vi
+            JOIN ingredients AS i ON vi.vetoIngredient = i.ingredientId
+            WHERE vi.userId = id);
     END;
     $$ LANGUAGE PLPGSQL;
     """
@@ -157,8 +161,8 @@ def user_trigger():
     execute(sql2)
     
 if __name__ == "__main__":
-    #createIngredientStoredFunction()
-    createTechniqueStoredFunction()
+    createIngredientStoredFunction()
+    #createTechniqueStoredFunction()
     #common_ingredients()
     #user_trigger()
     #deleteRatingProcedure()

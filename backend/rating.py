@@ -75,14 +75,14 @@ def deleteRating(inputTuple):
 def calculateAverageRating(recipeId):
 
     averageRating = 0
-    sql = """SELECT AVG(rating) FROM ratings WHERE recipeId = {0}""".format(recipeId)
+    sql = """SELECT AVG(rating) FROM ratings WHERE recipeId = {0} AND rating > 0""".format(recipeId)
 
     try:
         conn = pg_conn()
         cur = conn.cursor()
         cur.execute(sql)
         avg = cur.fetchone()
-        averageRating = int(avg[0])
+        averageRating = round(float(avg[0]), 2)
 
         recipeDb.update_one({'recipeId': recipeId}, {'$set': { 'averageRating': averageRating }} )
 

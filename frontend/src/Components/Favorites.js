@@ -60,9 +60,26 @@ class Favorites extends Component {
         }
     }
 
+    saveFavorite = (recipeId) => {
+      axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/rating/', {
+        userId: 1,
+        recipeId: recipeId,
+        favorite: 't',
+        rating: '',
+      }, {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+      }).then(response => {
+        console.log("SUCCESS", response);
+      }).catch(error => {
+        console.log(error)
+      });
+    }
+
     loadFavorites = () => {
-        axios.get('http://sp21-cs411-13.cs.illinois.edu:5000/api/favorite/', {
-          userId: this.props.userId, 
+        axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/favorite/', {
+          userId: 1, 
         }, {
           headers: {
               'Content-Type': 'application/json'
@@ -81,7 +98,7 @@ class Favorites extends Component {
             return
         }
         axios.delete('http://sp21-cs411-13.cs.illinois.edu:5000/api/favorite/', {
-          userId: this.props.userId,
+          userId: 1,
           recipeId: recipeId,
         }, {
           headers: {
