@@ -33,9 +33,12 @@ def createTechniqueStoredFunction():
 
     funct = """
     CREATE OR REPLACE FUNCTION getTechniques(id INT, vetoBool BOOL)
-    RETURNS TABLE(techniques INT) AS $$
+    RETURNS TABLE(techniques varchar(255)) AS $$
     BEGIN
-        RETURN QUERY(SELECT technique FROM userTechniques WHERE userId = id AND isVeto = vetoBool);
+        RETURN QUERY(SELECT t.techniqueName 
+        FROM userTechniques AS ut
+        JOIN techniques AS t ON ut.technique = t.techniqueId
+        WHERE ut.userId = id AND ut.isVeto = vetoBool);
     END;
     $$ LANGUAGE PLPGSQL;
     """
@@ -155,7 +158,7 @@ def user_trigger():
     
 if __name__ == "__main__":
     #createIngredientStoredFunction()
-    #createTechniqueStoredFunction()
+    createTechniqueStoredFunction()
     #common_ingredients()
     #user_trigger()
     #deleteRatingProcedure()
