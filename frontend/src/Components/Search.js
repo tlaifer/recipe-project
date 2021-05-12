@@ -134,10 +134,10 @@ class Search extends Component {
 
   saveFavorite = (recipeId) => {
     axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/rating/', {
-      userId: this.props.userId,
+      userId: 1,
       recipeId: recipeId,
       favorite: 't',
-      rating: '',
+      rating: 0,
     }, {
       headers: {
           'Content-Type': 'application/json'

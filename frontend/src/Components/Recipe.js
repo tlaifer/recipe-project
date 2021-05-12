@@ -29,12 +29,11 @@ class Recipe extends React.Component {
   };
 
   handleSendToFavorite = () => { 
-    this.setState({favorite: 't'})
     axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/rating/', {
-      userId: this.props.userId,
+      userId: 1,
       recipeId: this.state.recipeId,
       favorite: 't',
-      rating: this.state.rating,
+      rating: this.state.rating == "" ? 0 : this.state.rating,
     }, {
       headers: {
           'Content-Type': 'application/json'
@@ -66,7 +65,7 @@ class Recipe extends React.Component {
 
   handleSubmit = () => {
     axios.post('http://sp21-cs411-13.cs.illinois.edu:5000/api/rating/', {
-      userId: this.props.userId,
+      userId: 1,
       recipeId: this.state.recipeId,
       favorite: this.state.favorite,
       rating: this.state.rating,

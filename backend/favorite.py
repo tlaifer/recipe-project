@@ -68,7 +68,7 @@ def getFavoriteRecipes(userId, favoriteIds):
 def deleteFavorite(inputTuple):
 
     upsert_sql = '''
-    INSERT INTO ratings (userId,recipeId, rating, favorite)
+    INSERT INTO ratings (userId, recipeId, rating, favorite)
         VALUES (%s, %s, %s, %s)
         ON CONFLICT (userId, recipeId)
         DO UPDATE SET

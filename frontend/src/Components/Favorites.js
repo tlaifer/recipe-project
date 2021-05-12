@@ -65,7 +65,7 @@ class Favorites extends Component {
         userId: 1,
         recipeId: recipeId,
         favorite: 't',
-        rating: '',
+        rating: 0,
       }, {
         headers: {
             'Content-Type': 'application/json'
@@ -98,10 +98,10 @@ class Favorites extends Component {
             return
         }
         axios.delete('http://sp21-cs411-13.cs.illinois.edu:5000/api/favorite/', {
-          userId: 1,
-          recipeId: recipeId,
-        }, {
-          headers: {
+          data: {
+            userId: 1,
+            recipeId: recipeId,
+        }, headers: {
               'Content-Type': 'application/json'
           }
         }).then(response => {
@@ -122,7 +122,7 @@ class Favorites extends Component {
         this.handleLoadRecommendations()
         return(
             <div className = 'body'>
-            <h1> Favorites for User: insert username</h1>
+            <h1> Your Favorite Recipes </h1>
               <TableContainer component={Paper}>
                 <Table className="table" aria-label="simple table">
                   <TableHead>
@@ -148,7 +148,7 @@ class Favorites extends Component {
                         <TableCell align="center">{row.averageRating}</TableCell>
                         <TableCell align="center">{row.techniqueCount}</TableCell>
                         <TableCell align="right">
-                          <Button onClick={this.removeFavorite(row.id)}>
+                          <Button onClick={() => {this.removeFavorite(row.id)}}>
                             <FavoriteIcon/>
                           </Button>
                         </TableCell>

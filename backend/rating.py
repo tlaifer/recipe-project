@@ -101,7 +101,7 @@ class RatingAPI(Resource):
     def post(self):
         parser.add_argument('userId', type=int)
         parser.add_argument('recipeId', type=int)
-        parser.add_argument('rating', type=int)
+        parser.add_argument('rating', type=int, default=0)
         parser.add_argument('favorite', type=bool)
         args = parser.parse_args()
 
